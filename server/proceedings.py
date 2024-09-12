@@ -2,7 +2,6 @@ import os
 import json
 import sqlite3
 import requests
-import sciapi
 import bs4
 
 proceeding_input = [
@@ -16,9 +15,6 @@ full_path = os.path.join(os.getcwd(), db_file)
 con = sqlite3.connect(full_path)
 print("Database opened successfully, db file: ", full_path)
 
-# scihub = sciapi.SciHub()
-# print(scihub._get_available_scihub_urls())
-# print("SciHub initialized successfully")
 
 # crossref
 # https://api.crossref.org/work/{doi}
@@ -132,22 +128,36 @@ for input_file in proceeding_input:
                         with open(check_pdf_path, "rb") as f:
                             pdf_raw_blob = f.read()
                     else:
-                        # call cmd scihub -s {doi}
-                        os.system(f"scihub -s {doi_nums_raw}")
-                        # check the pdf/{check_pdf_name} again to see if downloaded
-                        if os.path.exists(check_pdf_path):
-                            print(f"pdf downloaded: {check_pdf_name}")
-                            with open(check_pdf_path, "rb") as f:
-                                pdf_raw_blob = f.read()
-                            # # zip the blob
-                            # import zipfile
-                            # with zipfile.ZipFile(f"pdf/{check_pdf_name}.zip", "w") as zf:
-                            #     zf.write(check_pdf_path)
-                            # zip_blob = None
-                            # with open(f"pdf/{check_pdf_name}.zip", "rb") as f:
-                            #     zip_blob = f.read()
+                        # first quick check whether it's on scihub
+                        # url = https://www.wellesu.com/{doi}
+                        url = f"https://www.wellesu.com/{doi_nums_raw}"
+                        response = requests.get(url)
+                        soup = bs4.BeautifulSoup(response.text, "html.parser")
+                        # check if it's contains "Unfortunatly"
+                        # print(soup.text)
+                        if "Unfortunately" in soup.text or "不在" in soup.text:
+                            print(f"paper with doi {
+                                  doi_nums_raw} not found on scihub")
                         else:
-                            print(f"error downloading pdf: {check_pdf_name}")
+                            print(f"paper with doi {
+                                  doi_nums_raw} found on scihub")
+                            # call cmd scihub -s {doi}
+                            os.system(f"scihub -s {doi_nums_raw}")
+                            # check the pdf/{check_pdf_name} again to see if downloaded
+                            if os.path.exists(check_pdf_path):
+                                print(f"pdf downloaded: {check_pdf_name}")
+                                with open(check_pdf_path, "rb") as f:
+                                    pdf_raw_blob = f.read()
+                                # # zip the blob
+                                # import zipfile
+                                # with zipfile.ZipFile(f"pdf/{check_pdf_name}.zip", "w") as zf:
+                                #     zf.write(check_pdf_path)
+                                # zip_blob = None
+                                # with open(f"pdf/{check_pdf_name}.zip", "rb") as f:
+                                #     zip_blob = f.read()
+                            else:
+                                print(f"error downloading pdf: {
+                                      check_pdf_name}")
 
                     insert_or_update(
                         con=con, table=db_table, caption=caption, year=year, ptitle=ptitle, pdoi=pdoi, authors=author_str, reference_raw=reference_raw_str, pdf=pdf_raw_blob)

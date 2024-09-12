@@ -24,14 +24,30 @@ def get_pdf(request):
     con.close()
     return Response(pdf, content_type='application/pdf')
 
+def get_abstract(request):
+    # get the id of the paper
+    id = request.matchdict['id']
+    # open the database and get the entry
+    con = sqlite3.connect(db_file)
+    cur = con.cursor()
+    cur.execute(
+        f"SELECT abstract FROM {db_table} WHERE id = ?", (id,))
+    abstract = cur.fetchone()[0]
+    con.close()
+    return Response(abstract)
+
 def get_paper_entries(request):
     # open the database and get all the entries
     con = sqlite3.connect(db_file)
     cur = con.cursor()
     cur.execute(
-        f"SELECT id, title, parent, year, doi, authors, gen_keywords, pdf FROM {db_table}")
+        f"SELECT id, title, parent, year, doi, authors, gen_keywords, pdf, gen_category, gen_ccs FROM {db_table}")
     json_data = []
+
     for row in cur.fetchall():
+        c = "none"
+        if row[8] is not None:
+            c = row[8]
         json_data.append({
             "id": row[0],
             "title": row[1],
@@ -40,10 +56,14 @@ def get_paper_entries(request):
             "doi": row[4],
             # "authors": row[5],
             "keywords": row[6],
-            "has_pdf": row[7] is not None
+            "has_pdf": row[7] is not None,
+            "category": c,
+            "ccs": row[9]
         })
     # default sorted by year in reverse order
     json_data = sorted(json_data, key=lambda x: x["year"], reverse=True)
+    # # then for each year, sort by category
+    # json_data = sorted(json_data, key=lambda x: x["category"])
     con.close()
     return Response(json=json_data)
 
@@ -59,6 +79,9 @@ if __name__ == '__main__':
 
         config.add_route('get_pdf', '/get_pdf/{id}')
         config.add_view(get_pdf, route_name='get_pdf')
+
+        config.add_route('get_abstract', '/get_abstract/{id}')
+        config.add_view(get_abstract, route_name='get_abstract')
 
         app = config.make_wsgi_app()
 
