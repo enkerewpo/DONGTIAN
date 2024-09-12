@@ -1,0 +1,562 @@
+{
+  "py/object": "__main__.ProceedingSource",
+  "url": "https://dl.acm.org/conference/sosp/proceedings",
+  "caption": "SOSP",
+  "proceeding_entrys": [
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '23: Proceedings of the 29th Symposium on Operating Systems Principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/3600006",
+      "paper_entrys": [
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "TreeSLS: A Whole-system Persistent Microkernel with Tree-structured State Checkpoint on NVM",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613160",
+          "doi": "https://doi.org/10.1145/3600006.3613160"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "MEMTIS: Efficient Memory Tiering with Dynamic Page Classification and Page Size Determination",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613167",
+          "doi": "https://doi.org/10.1145/3600006.3613167"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Snowcat: Efficient Kernel Concurrency Testing using a Learned Coverage Predictor",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613148",
+          "doi": "https://doi.org/10.1145/3600006.3613148"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "One Simple API Can Cause Hundreds of Bugs An Analysis of Refcounting Bugs in All Modern Linux Kernels",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613162",
+          "doi": "https://doi.org/10.1145/3600006.3613162"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Validating JIT Compilers via Compilation Space Exploration",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613140",
+          "doi": "https://doi.org/10.1145/3600006.3613140"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Automated Verification of an In-Production DNS Authoritative Engine",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613153",
+          "doi": "https://doi.org/10.1145/3600006.3613153"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Acto: Automatic End-to-End Testing for Operation Correctness of Cloud System Management",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613161",
+          "doi": "https://doi.org/10.1145/3600006.3613161"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Grove: a Separation-Logic Library for Verifying Distributed Systems",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613172",
+          "doi": "https://doi.org/10.1145/3600006.3613172"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "FIFO queues are all you need for cache eviction",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613147",
+          "doi": "https://doi.org/10.1145/3600006.3613147"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Enabling High-Performance and Secure Userspace NVM File Systems with the Trio Architecture",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613171",
+          "doi": "https://doi.org/10.1145/3600006.3613171"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Project Silica: Towards Sustainable Cloud Archival Storage in Glass",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613208",
+          "doi": "https://doi.org/10.1145/3600006.3613208"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "RackBlox: A Software-Defined Rack-Scale Storage System with Network-Storage Co-Design",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613170",
+          "doi": "https://doi.org/10.1145/3600006.3613170"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Cornflakes: Zero-Copy Serialization for Microsecond-Scale Networking",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613137",
+          "doi": "https://doi.org/10.1145/3600006.3613137"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Understanding Silent Data Corruptions in a Large Production CPU Population",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613149",
+          "doi": "https://doi.org/10.1145/3600006.3613149"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "XFaaS: Hyperscale and Low Cost Serverless Functions at Meta",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613155",
+          "doi": "https://doi.org/10.1145/3600006.3613155"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Pushing Performance Isolation Boundaries into Application with pBox",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613159",
+          "doi": "https://doi.org/10.1145/3600006.3613159"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Flexible Advancement in Asynchronous BFT Consensus",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613164",
+          "doi": "https://doi.org/10.1145/3600006.3613164"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "QuePaxa: Escaping the tyranny of timeouts in consensus",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613150",
+          "doi": "https://doi.org/10.1145/3600006.3613150"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Antipode: Enforcing Cross-Service Causal Consistency in Distributed Applications",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613176",
+          "doi": "https://doi.org/10.1145/3600006.3613176"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Halfmoon: Log-Optimal Fault-Tolerant Stateful Serverless Computing",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613154",
+          "doi": "https://doi.org/10.1145/3600006.3613154"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "PIT: Optimization of Dynamic Sparse Deep Learning Models via Permutation Invariant Transformation",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613139",
+          "doi": "https://doi.org/10.1145/3600006.3613139"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Bagpipe: Accelerating Deep Recommendation Model Training",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613142",
+          "doi": "https://doi.org/10.1145/3600006.3613142"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "GEMINI: Fast Failure Recovery in Distributed Training with In-Memory Checkpoints",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613145",
+          "doi": "https://doi.org/10.1145/3600006.3613145"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Oobleck: Resilient Distributed Training of Large Models Using Pipeline Templates",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613152",
+          "doi": "https://doi.org/10.1145/3600006.3613152"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Private Web Search with Tiptoe",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613134",
+          "doi": "https://doi.org/10.1145/3600006.3613134"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Siloz: Leveraging DRAM Isolation Domains to Prevent Inter-VM Rowhammer",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613143",
+          "doi": "https://doi.org/10.1145/3600006.3613143"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Edna: Disguising and Revealing User Data in Web Applications",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613146",
+          "doi": "https://doi.org/10.1145/3600006.3613146"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Arboretum: A Planner for Large-Scale Federated Analytics with Differential Privacy",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3624566",
+          "doi": "https://doi.org/10.1145/3600006.3624566"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Achieving Microsecond-Scale Tail Latency Efficiently with Approximate Optimal Scheduling",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613136",
+          "doi": "https://doi.org/10.1145/3600006.3613136"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Blueprint: A Toolchain for Highly-Reconfigurable Microservice Applications",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613138",
+          "doi": "https://doi.org/10.1145/3600006.3613138"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "A Cloud-Scale Characterization of Remote Procedure Calls",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613156",
+          "doi": "https://doi.org/10.1145/3600006.3613156"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "PVM: Efficient Shadow Paging for Deploying Secure Containers in Cloud-native Environment",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613158",
+          "doi": "https://doi.org/10.1145/3600006.3613158"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Falcon: Fast OLTP Engine for Persistent Cache and Non-Volatile Memory",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613141",
+          "doi": "https://doi.org/10.1145/3600006.3613141"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "SPFresh: Incremental In-Place Update for Billion-Scale Vector Search",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613166",
+          "doi": "https://doi.org/10.1145/3600006.3613166"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "gSampler: General and Efficient GPU-based Graph Sampling for Graph Learning",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613168",
+          "doi": "https://doi.org/10.1145/3600006.3613168"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Turbo: Effective Caching in Differentially-Private Databases",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613174",
+          "doi": "https://doi.org/10.1145/3600006.3613174"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Paella: Low-latency Model Serving with Software-defined GPU Scheduling",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613163",
+          "doi": "https://doi.org/10.1145/3600006.3613163"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Efficient Memory Management for Large Language Model Serving with PagedAttention",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613165",
+          "doi": "https://doi.org/10.1145/3600006.3613165"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "UGACHE: A Unified GPU Cache for Embedding-based Deep Learning",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613169",
+          "doi": "https://doi.org/10.1145/3600006.3613169"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Sia: Heterogeneity-aware, goodput-optimized ML-cluster scheduling",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613175",
+          "doi": "https://doi.org/10.1145/3600006.3613175"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Partial Failure Resilient Memory Management System for (CXL-based) Distributed Shared Memory",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613135",
+          "doi": "https://doi.org/10.1145/3600006.3613135"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Ditto: An Elastic and Adaptive Memory-Disaggregated Caching System",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613144",
+          "doi": "https://doi.org/10.1145/3600006.3613144"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Mira: A Program-Behavior-Guided Far Memory System",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3600006.3613157",
+          "doi": "https://doi.org/10.1145/3600006.3613157"
+        }
+      ]
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '21: Proceedings of the ACM SIGOPS 28th Symposium on Operating Systems Principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/3477132",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '19: Proceedings of the 27th ACM Symposium on Operating Systems Principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/3341301",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '17: Proceedings of the 26th Symposium on Operating Systems Principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/3132747",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '15: Proceedings of the 25th Symposium on Operating Systems Principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/2815400",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '15: SOSP History Day 2015",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/2830903",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '13: Proceedings of the Twenty-Fourth ACM Symposium on Operating Systems Principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/2517349",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '11: Proceedings of the Twenty-Third ACM Symposium on Operating Systems Principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/2043556",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '09: Proceedings of the ACM SIGOPS 22nd symposium on Operating systems principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/1629575",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '07: Proceedings of twenty-first ACM SIGOPS symposium on Operating systems principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/1294261",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '05: Proceedings of the twentieth ACM symposium on Operating systems principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/1095810",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '03: Proceedings of the nineteenth ACM symposium on Operating systems principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/945445",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '01: Proceedings of the eighteenth ACM symposium on Operating systems principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/502034",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '99: Proceedings of the seventeenth ACM symposium on Operating systems principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/319151",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '97: Proceedings of the sixteenth ACM symposium on Operating systems principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/268998",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '95: Proceedings of the fifteenth ACM symposium on Operating systems principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/224056",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '93: Proceedings of the fourteenth ACM symposium on Operating systems principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/168619",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '91: Proceedings of the thirteenth ACM symposium on Operating systems principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/121132",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '89: Proceedings of the twelfth ACM symposium on Operating systems principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/74850",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '87: Proceedings of the eleventh ACM Symposium on Operating systems principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/41457",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '85: Proceedings of the tenth ACM symposium on Operating systems principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/323647",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '83: Proceedings of the ninth ACM symposium on Operating systems principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/800217",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '81: Proceedings of the eighth ACM symposium on Operating systems principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/800216",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '79: Proceedings of the seventh ACM symposium on Operating systems principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/800215",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '77: Proceedings of the sixth ACM symposium on Operating systems principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/800214",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '75: Proceedings of the fifth ACM symposium on Operating systems principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/800213",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '73: Proceedings of the fourth ACM symposium on Operating system principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/800009",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '71: Proceedings of the third ACM symposium on Operating systems principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/800212",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '69: Proceedings of the second symposium on Operating systems principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/961053",
+      "paper_entrys": []
+    },
+    {
+      "py/object": "__main__.ProceedingEntry",
+      "title": "SOSP '67: Proceedings of the first ACM symposium on Operating System Principles",
+      "year": 1900,
+      "url": "https://dl.acm.org/doi/proceedings/10.1145/800001",
+      "paper_entrys": []
+    }
+  ]
+}
