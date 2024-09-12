@@ -2,7 +2,6 @@ import os
 import json
 import sqlite3
 import requests
-import sciapi
 import bs4
 
 proceeding_input = [
@@ -16,9 +15,6 @@ full_path = os.path.join(os.getcwd(), db_file)
 con = sqlite3.connect(full_path)
 print("Database opened successfully, db file: ", full_path)
 
-# scihub = sciapi.SciHub()
-# print(scihub._get_available_scihub_urls())
-# print("SciHub initialized successfully")
 
 # crossref
 # https://api.crossref.org/work/{doi}

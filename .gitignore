@@ -163,3 +163,4 @@ cython_debug/
 
 core.db
 pdf
+openai.json

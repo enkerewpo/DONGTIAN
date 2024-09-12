@@ -6,10 +6,28 @@ import { useGlobalConfig } from 'vuestic-ui';
 // Define a reference for storing the paper entries data.
 const paperEntries = ref([]);
 
+let category_list = [];
+let map_category_to_color = {};
+
+function random_color(str) {
+  // hash the string to a number, so that the color is determined by the string
+  let hash = 0;
+  if (str == null || str.length == 0) str = "default";
+  let len = str.length;
+  for (let i = 0; i < len; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  // generate a random color
+  let c = (hash & 0x00FFFFFF)
+    .toString(16)
+    .toUpperCase();
+  return "#" + "00000".substring(0, 6 - c.length) + c;
+}
 
 function process(data) {
   console.log(data);
   let r = [];
+  category_list = [];
   for (let i = 0; i < data.length; i++) {
     let entry = data[i];
     let authors = entry.authors;
@@ -18,6 +36,11 @@ function process(data) {
     let keywords_str = entry.keywords;
     let has_pdf = entry.has_pdf;
     let pdf_open_url = "/api/get_pdf/" + entry.id;
+    let category = entry.category;
+    if (!category_list.includes(category)) {
+      category_list.push(category);
+      map_category_to_color[category] = random_color(category);
+    }
     r.push({
       // id: entry.id,
       title: entry.title,
@@ -27,6 +50,8 @@ function process(data) {
       // authors: authors_str,
       keywords: keywords_str,
       has_pdf: has_pdf,
+      category: category,
+      category_color: map_category_to_color[category],
       pdf_open_url: pdf_open_url,
     });
   }
@@ -119,6 +144,7 @@ export default {
               <th>Parent</th>
               <th>Year</th>
               <th>DOI</th>
+              <th>Category</th>
               <th>Keywords</th>
               <th>PDF</th>
             </tr>
@@ -129,13 +155,16 @@ export default {
               <td>{{ p.parent }}</td>
               <td>{{ p.year }}</td>
               <td> <a :href="p.doi" target="_blank" class="va-link">{{ p.doi }}</a> </td>
+              <td>
+                <VaBadge :text="p.category" :color="p.category_color" />
+              </td>
               <td>{{ p.keywords }}</td>
               <td>
                 <!-- if has pdf, show the button -->
-                <VaButton v-if="p.has_pdf" size="small" @click="openPdf(p.pdf_open_url)" color="primary">打开PDF
+                <VaButton v-if="p.has_pdf" size="small" @click="openPdf(p.pdf_open_url)" color="primary">PDF
                 </VaButton>
                 <!-- if no pdf, show the disabled button -->
-                <VaButton v-else size="small" disabled>无PDF</VaButton>
+                <VaButton v-else size="small" disabled>PDF</VaButton>
               </td>
             </tr>
           </tbody>
