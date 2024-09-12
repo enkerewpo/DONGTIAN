@@ -63,12 +63,12 @@ def get_papers_with_pdf(con, table):
 
 
 def update_full_text_db(con, table, paper):
-    # if the db already has the full text, then skip
-    cur = con.cursor()
-    cur.execute(f"SELECT text FROM {table} WHERE id = ?", (paper[0],))
-    text = cur.fetchone()
-    if text is not None:
-        return
+    # # if the db already has the full text, then skip
+    # cur = con.cursor()
+    # cur.execute(f"SELECT text FROM {table} WHERE id = ?", (paper[0],))
+    # text = cur.fetchone()
+    # if text is not None:
+    #     return
     # first read the pdf file
     id, doi = paper
     pdf_path = get_pdf_path(doi)
@@ -119,7 +119,7 @@ def update_category_db(con, table, paper):
     response = get_llm_response(text[:600], history)
     response = response.strip()
     response = response.replace("*", "")
-    print(response)
+    print(f"category: {response}")
     # add the category into the database
     cur.execute(
         f"UPDATE {table} SET gen_category = ? WHERE id = ?", (response, paper[0]))
@@ -130,10 +130,10 @@ def update_category_db(con, table, paper):
 def update_keywords_db(con, table, paper):
     # if the db already has the keywords, then skip
     cur = con.cursor()
-    cur.execute(f"SELECT gen_keywords FROM {table} WHERE id = ?", (paper[0],))
-    keywords = cur.fetchone()
-    if keywords is not None:
-        return
+    # cur.execute(f"SELECT gen_keywords FROM {table} WHERE id = ?", (paper[0],))
+    # keywords = cur.fetchone()
+    # if keywords is not None:
+    #     return
     # get the full text
     cur.execute(f"SELECT text FROM {table} WHERE id = ?", (paper[0],))
     text = cur.fetchone()[0]
@@ -142,8 +142,10 @@ def update_keywords_db(con, table, paper):
     history.append(
         {"role": "user", "content": "response should be no more than 5 keywords, separated by comma, just give me the keywords, all lowercase"})
     # only send the first 600 characters of the text
-    response = get_llm_response(text[:800], history)
-    print(response)
+    response = get_llm_response(text[:600], history)
+    response = response.strip()
+    response = response.replace("*", "")
+    print(f"keywords: {response}")
     # add the keywords into the database
     cur.execute(
         f"UPDATE {table} SET gen_keywords = ? WHERE id = ?", (response, paper[0]))
