@@ -59,6 +59,9 @@ sosp_source = ProceedingSource(
 # first get the proceeding entries
 
 
+global_proceeding_source = [sosp_source]
+
+
 def get_proceeding_entries(ps):
     page = requests.get(ps.url)
     soup = BeautifulSoup(page.content, 'html.parser')
@@ -133,14 +136,23 @@ def get_paper_entries(pe):
     driver.close()
 
 
-get_proceeding_entries(sosp_source)
+# get_proceeding_entries(sosp_source)
 
-print(f'Found {len(sosp_source.proceeding_entrys)} proceeding entries')
+# print(f'Found {len(sosp_source.proceeding_entrys)} proceeding entries')
 
-# get recent 5 proceeding entries
-for pe in sosp_source.proceeding_entrys[:1]:
-    get_paper_entries(pe)
+# # get recent 5 proceeding entries
+# for pe in sosp_source.proceeding_entrys[:4]:
+#     get_paper_entries(pe)
+#     # save the data with pretty print
+#     with open('sosp_source.json', 'w') as f:
+#         f.write(jsonpickle.dumps(sosp_source, indent=2))
 
-# save the data with pretty print
-with open('sosp_source.json', 'w') as f:
-    f.write(jsonpickle.dumps(sosp_source, indent=2))
+for ps in global_proceeding_source:
+    get_proceeding_entries(ps)
+    print(f'Found {len(ps.proceeding_entrys)} proceeding entries')
+    for pe in ps.proceeding_entrys:
+        get_paper_entries(pe)
+        # save the data with pretty print, caption to non-capitalize
+        prefix = ps.caption.lower()
+        with open(f'{prefix}_source.json', 'w') as f:
+            f.write(jsonpickle.dumps(ps, indent=2))

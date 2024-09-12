@@ -360,21 +360,1008 @@
       "title": "SOSP '21: Proceedings of the ACM SIGOPS 28th Symposium on Operating Systems Principles",
       "year": 1900,
       "url": "https://dl.acm.org/doi/proceedings/10.1145/3477132",
-      "paper_entrys": []
+      "paper_entrys": [
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Basil: Breaking up BFT with ACID (transactions)",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483552",
+          "doi": "https://doi.org/10.1145/3477132.3483552"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Bidl: A High-throughput, Low-latency Permissioned Blockchain Framework for Datacenter Networks",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483574",
+          "doi": "https://doi.org/10.1145/3477132.3483574"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Kauri: Scalable BFT Consensus with Pipelined Tree-Based Dissemination and Aggregation",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483584",
+          "doi": "https://doi.org/10.1145/3477132.3483584"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "iGUARD: In-GPU Advanced Race Detection",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483545",
+          "doi": "https://doi.org/10.1145/3477132.3483545"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Snowboard: Finding Kernel Concurrency Bugs through Systematic Inter-thread Communication Analysis",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483549",
+          "doi": "https://doi.org/10.1145/3477132.3483549"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Rudra: Finding Memory Safety Bugs in Rust at the Ecosystem Scale",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483570",
+          "doi": "https://doi.org/10.1145/3477132.3483570"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Witcher: Systematic Crash Consistency Testing for Non-Volatile Memory Key-Value Stores",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483556",
+          "doi": "https://doi.org/10.1145/3477132.3483556"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Understanding and Detecting Software Upgrade Failures in Distributed Systems",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483577",
+          "doi": "https://doi.org/10.1145/3477132.3483577"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Crash Consistent Non-Volatile Memory Express",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483592",
+          "doi": "https://doi.org/10.1145/3477132.3483592"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Cuckoo Trie: Exploiting Memory-Level Parallelism for Efficient DRAM Indexing",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483551",
+          "doi": "https://doi.org/10.1145/3477132.3483551"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Regular Sequential Serializability and Regular Sequential Consistency",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483566",
+          "doi": "https://doi.org/10.1145/3477132.3483566"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Caracal: Contention Management with Deterministic Concurrency Control",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483591",
+          "doi": "https://doi.org/10.1145/3477132.3483591"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "The Demikernel Datapath OS Architecture for Microsecond-scale Datacenter Systems",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483569",
+          "doi": "https://doi.org/10.1145/3477132.3483569"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Birds of a Feather Flock Together: Scaling RDMA RPCs with Flock",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483576",
+          "doi": "https://doi.org/10.1145/3477132.3483576"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "PRISM: Rethinking the RDMA Interface for Distributed Systems",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483587",
+          "doi": "https://doi.org/10.1145/3477132.3483587"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Kangaroo: Caching Billions of Tiny Objects on Flash",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483568",
+          "doi": "https://doi.org/10.1145/3477132.3483568"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "IODA: A Host/Device Co-Design for Strong Predictability Contract on Modern Flash Storage",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483573",
+          "doi": "https://doi.org/10.1145/3477132.3483573"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "FragPicker: A New Defragmentation Tool for Modern Storage Devices",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483593",
+          "doi": "https://doi.org/10.1145/3477132.3483593"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "dSpace: Composable Abstractions for Smart Spaces",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483559",
+          "doi": "https://doi.org/10.1145/3477132.3483559"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Random Walks on Huge Graphs at Cache Efficiency",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483575",
+          "doi": "https://doi.org/10.1145/3477132.3483575"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Mycelium: Large-Scale Distributed Graph Queries with Differential Privacy",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483585",
+          "doi": "https://doi.org/10.1145/3477132.3483585"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "HEALER: Relation Learning Guided Kernel Fuzzing",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483547",
+          "doi": "https://doi.org/10.1145/3477132.3483547"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Gradient Compression Supercharged High-Performance Data Parallel DNN Training",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483553",
+          "doi": "https://doi.org/10.1145/3477132.3483553"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Generating Complex, Realistic Cloud Workloads using Recurrent Neural Networks",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483590",
+          "doi": "https://doi.org/10.1145/3477132.3483590"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "HeMem: Scalable Tiered Memory Management for Big Data Applications and Real NVM",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483550",
+          "doi": "https://doi.org/10.1145/3477132.3483550"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "J-NVM: Off-heap Persistent Objects in Java",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483579",
+          "doi": "https://doi.org/10.1145/3477132.3483579"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "PACTree: A High Performance Persistent Range Index Using PAC Guidelines",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483589",
+          "doi": "https://doi.org/10.1145/3477132.3483589"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Exploiting Nil-Externality for Fast Replicated Storage",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483543",
+          "doi": "https://doi.org/10.1145/3477132.3483543"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Geometric Partitioning: Explore the Boundary of Optimal Erasure Code Repair",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483558",
+          "doi": "https://doi.org/10.1145/3477132.3483558"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Rabia: Simplifying State-Machine Replication Through Randomization",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483582",
+          "doi": "https://doi.org/10.1145/3477132.3483582"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "MIND: In-Network Memory Management for Disaggregated Data Centers",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483561",
+          "doi": "https://doi.org/10.1145/3477132.3483561"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "RAS: Continuously Optimized Region-Wide Datacenter Resource Allocation",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483578",
+          "doi": "https://doi.org/10.1145/3477132.3483578"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Solving Large-Scale Granular Resource Allocation Problems Efficiently with POP",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483588",
+          "doi": "https://doi.org/10.1145/3477132.3483588"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Log-structured Protocols in Delos",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483544",
+          "doi": "https://doi.org/10.1145/3477132.3483544"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Shard Manager: A Generic Shard Management Framework for Geo-distributed Applications",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483546",
+          "doi": "https://doi.org/10.1145/3477132.3483546"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Forerunner: Constraint-based Speculative Transaction Execution for Ethereum",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483564",
+          "doi": "https://doi.org/10.1145/3477132.3483564"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "ghOSt: Fast & Flexible User-Space Delegation of Linux Scheduling",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483542",
+          "doi": "https://doi.org/10.1145/3477132.3483542"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Syrup: User-Defined Scheduling Across the Stack",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483548",
+          "doi": "https://doi.org/10.1145/3477132.3483548"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "When Idling is Ideal: Optimizing Tail-Latency for Heavy-Tailed Datacenter Workloads with Pers\u00e9phone",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483571",
+          "doi": "https://doi.org/10.1145/3477132.3483571"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "TwinVisor: Hardware-isolated Confidential Virtual Machines for ARM",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483554",
+          "doi": "https://doi.org/10.1145/3477132.3483554"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Snoopy: Surpassing the Scalability Bottleneck of Oblivious Storage",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483562",
+          "doi": "https://doi.org/10.1145/3477132.3483562"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Coeus: A System for Oblivious Document Ranking and Retrieval",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483586",
+          "doi": "https://doi.org/10.1145/3477132.3483586"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Boki: Stateful Serverless Computing with Shared Logs",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483541",
+          "doi": "https://doi.org/10.1145/3477132.3483541"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Bladerunner: Stream Processing at Scale for a Live View of Backend Data Mutations at the Edge",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483572",
+          "doi": "https://doi.org/10.1145/3477132.3483572"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Faster and Cheaper Serverless Computing on Harvested Resources",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483580",
+          "doi": "https://doi.org/10.1145/3477132.3483580"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Xenic: SmartNIC-Accelerated Distributed Transactions",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483555",
+          "doi": "https://doi.org/10.1145/3477132.3483555"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "LineFS: Efficient SmartNIC Offload of a Distributed File System with Pipeline Parallelism",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483565",
+          "doi": "https://doi.org/10.1145/3477132.3483565"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Automated SmartNIC Offloading Insights for Network Functions",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483583",
+          "doi": "https://doi.org/10.1145/3477132.3483583"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "The Aurora Single Level Store Operating System",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483563",
+          "doi": "https://doi.org/10.1145/3477132.3483563"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "WineFS: a hugepage-aware file system for persistent memory that ages gracefully",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483567",
+          "doi": "https://doi.org/10.1145/3477132.3483567"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Scale and Performance in a Filesystem Semi-Microkernel",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483581",
+          "doi": "https://doi.org/10.1145/3477132.3483581"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Using Lightweight Formal Methods to Validate a Key-Value Storage Node in Amazon S3",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483540",
+          "doi": "https://doi.org/10.1145/3477132.3483540"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "CLoF: A Compositional Lock Framework for Multi-level NUMA Systems",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483557",
+          "doi": "https://doi.org/10.1145/3477132.3483557"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Formal Verification of a Multiprocessor Hypervisor on Arm Relaxed Memory Hardware",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3477132.3483560",
+          "doi": "https://doi.org/10.1145/3477132.3483560"
+        }
+      ]
     },
     {
       "py/object": "__main__.ProceedingEntry",
       "title": "SOSP '19: Proceedings of the 27th ACM Symposium on Operating Systems Principles",
       "year": 1900,
       "url": "https://dl.acm.org/doi/proceedings/10.1145/3341301",
-      "paper_entrys": []
+      "paper_entrys": [
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "PipeDream: generalized pipeline parallelism for DNN training",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359646",
+          "doi": "https://doi.org/10.1145/3341301.3359646"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "A generic communication scheduler for distributed DNN training acceleration",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359642",
+          "doi": "https://doi.org/10.1145/3341301.3359642"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Parity models: erasure-coded resilience for prediction serving systems",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359654",
+          "doi": "https://doi.org/10.1145/3341301.3359654"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "TASO: optimizing deep learning computation with automatic generation of graph substitutions",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359630",
+          "doi": "https://doi.org/10.1145/3341301.3359630"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Teechain: a secure payment network with asynchronous blockchain access",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359627",
+          "doi": "https://doi.org/10.1145/3341301.3359627"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Fast and secure global payments with Stellar",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359636",
+          "doi": "https://doi.org/10.1145/3341301.3359636"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Notary: a device for secure transaction approval",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359661",
+          "doi": "https://doi.org/10.1145/3341301.3359661"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "CrashTuner: detecting crash-recovery bugs in cloud systems via meta-info analysis",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359645",
+          "doi": "https://doi.org/10.1145/3341301.3359645"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "The inflection point hypothesis: a principled debugging approach for locating the root cause of a failure",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359650",
+          "doi": "https://doi.org/10.1145/3341301.3359650"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Finding semantic bugs in file systems with an extensible fuzzing framework",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359662",
+          "doi": "https://doi.org/10.1145/3341301.3359662"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Efficient scalable thread-safety-violation detection: finding thousands of concurrency bugs during testing",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359638",
+          "doi": "https://doi.org/10.1145/3341301.3359638"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Privacy accounting and quality control in the sage differentially private ML platform",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359639",
+          "doi": "https://doi.org/10.1145/3341301.3359639"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Honeycrisp: large-scale differentially private aggregation without a trusted core",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359660",
+          "doi": "https://doi.org/10.1145/3341301.3359660"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Yodel: strong metadata security for voice calls",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359648",
+          "doi": "https://doi.org/10.1145/3341301.3359648"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Scaling symbolic evaluation for automated verification of systems code with Serval",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359641",
+          "doi": "https://doi.org/10.1145/3341301.3359641"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Verifying concurrent, crash-safe systems with Perennial",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359632",
+          "doi": "https://doi.org/10.1145/3341301.3359632"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Using concurrent relational logic with helpers for verifying the AtomFS file system",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359644",
+          "doi": "https://doi.org/10.1145/3341301.3359644"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Verifying software network functions with no verification expertise",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359647",
+          "doi": "https://doi.org/10.1145/3341301.3359647"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Optimizing data-intensive computations in existing libraries with split annotations",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359652",
+          "doi": "https://doi.org/10.1145/3341301.3359652"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Niijima: sound and automated computation consolidation for efficient multilingual data-parallel pipelines",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359649",
+          "doi": "https://doi.org/10.1145/3341301.3359649"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Nexus: a GPU cluster engine for accelerating DNN-based video analysis",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359658",
+          "doi": "https://doi.org/10.1145/3341301.3359658"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Lineage stash: fault tolerance off the critical path",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359653",
+          "doi": "https://doi.org/10.1145/3341301.3359653"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "File systems unfit as distributed storage backends: lessons from 10 years of Ceph evolution",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359656",
+          "doi": "https://doi.org/10.1145/3341301.3359656"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "I4: incremental inference of inductive invariants for verification of distributed protocols",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359651",
+          "doi": "https://doi.org/10.1145/3341301.3359651"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Aegean: replication beyond the client-server model",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359663",
+          "doi": "https://doi.org/10.1145/3341301.3359663"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Snap: a microkernel approach to host networking",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359657",
+          "doi": "https://doi.org/10.1145/3341301.3359657"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Risk based planning of network changes in evolving data centers",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359664",
+          "doi": "https://doi.org/10.1145/3341301.3359664"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Taiji: managing global user traffic for large-scale internet services at the edge",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359655",
+          "doi": "https://doi.org/10.1145/3341301.3359655"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "KVell: the design and implementation of a fast persistent key-value store",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359628",
+          "doi": "https://doi.org/10.1145/3341301.3359628"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Recipe: converting concurrent DRAM indexes to persistent-memory indexes",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3341301.3359635",
+          "doi": "https://doi.org/10.1145/3341301.3359635"
+        }
+      ]
     },
     {
       "py/object": "__main__.ProceedingEntry",
       "title": "SOSP '17: Proceedings of the 26th Symposium on Operating Systems Principles",
       "year": 1900,
       "url": "https://dl.acm.org/doi/proceedings/10.1145/3132747",
-      "paper_entrys": []
+      "paper_entrys": [
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "DeepXplore: Automated Whitebox Testing of Deep Learning Systems",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132785",
+          "doi": "https://doi.org/10.1145/3132747.3132785"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Pensieve: Non-Intrusive Failure Reproduction for Distributed Systems using the Event Chaining Approach",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132768",
+          "doi": "https://doi.org/10.1145/3132747.3132768"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Canopy: An End-to-End Performance Tracing And Analysis System",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132749",
+          "doi": "https://doi.org/10.1145/3132747.3132749"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Algorand: Scaling Byzantine Agreements for Cryptocurrencies",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132757",
+          "doi": "https://doi.org/10.1145/3132747.3132757"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Scaling a file system to many cores using an operation log",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132779",
+          "doi": "https://doi.org/10.1145/3132747.3132779"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "SVE: Distributed Video Processing at Facebook Scale",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132775",
+          "doi": "https://doi.org/10.1145/3132747.3132775"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Eris: Coordination-Free Consistent Transactions Using In-Network Concurrency Control",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132751",
+          "doi": "https://doi.org/10.1145/3132747.3132751"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "NetCache: Balancing Key-Value Stores with Fast In-Network Caching",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132764",
+          "doi": "https://doi.org/10.1145/3132747.3132764"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "KV-Direct: High-Performance In-Memory Key-Value Store with Programmable NIC",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132756",
+          "doi": "https://doi.org/10.1145/3132747.3132756"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Resource Central: Understanding and Predicting Workloads for Improved Resource Management in Large Cloud Platforms",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132772",
+          "doi": "https://doi.org/10.1145/3132747.3132772"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "MittOS: Supporting Millisecond Tail Tolerance with Fast Rejecting SLO-Aware OS Interface",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132774",
+          "doi": "https://doi.org/10.1145/3132747.3132774"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Monotasks: Architecting for Performance Clarity in Data Analytics Frameworks",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132766",
+          "doi": "https://doi.org/10.1145/3132747.3132766"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "NEVE: Nested Virtualization Extensions for ARM",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132754",
+          "doi": "https://doi.org/10.1145/3132747.3132754"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "My VM is Lighter (and Safer) than your Container",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132763",
+          "doi": "https://doi.org/10.1145/3132747.3132763"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Multiprogramming a 64kB Computer Safely and Efficiently",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132786",
+          "doi": "https://doi.org/10.1145/3132747.3132786"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Hyperkernel: Push-Button Verification of an OS Kernel",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132748",
+          "doi": "https://doi.org/10.1145/3132747.3132748"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Verifying a high-performance crash-safe file system using a tree specification",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132776",
+          "doi": "https://doi.org/10.1145/3132747.3132776"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Komodo: Using verification to disentangle secure-enclave hardware from software",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132782",
+          "doi": "https://doi.org/10.1145/3132747.3132782"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "LITE Kernel RDMA Support for Datacenter Applications",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132762",
+          "doi": "https://doi.org/10.1145/3132747.3132762"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "ZygOS: Achieving Low Tail Latency for Microsecond-scale Networked Tasks",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132780",
+          "doi": "https://doi.org/10.1145/3132747.3132780"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "ffwd: delegation is (much) faster than you think",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132771",
+          "doi": "https://doi.org/10.1145/3132747.3132771"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Automatically Repairing Network Control Planes Using an Abstract Representation",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132753",
+          "doi": "https://doi.org/10.1145/3132747.3132753"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Drizzle: Fast and Adaptable Stream Processing at Scale",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132750",
+          "doi": "https://doi.org/10.1145/3132747.3132750"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Rocksteady: Fast Migration for Low-latency In-memory Storage",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132784",
+          "doi": "https://doi.org/10.1145/3132747.3132784"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Atom: Horizontally Scaling Strong Anonymity",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132755",
+          "doi": "https://doi.org/10.1145/3132747.3132755"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Stadium: A Distributed Metadata-Private Messaging System",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132783",
+          "doi": "https://doi.org/10.1145/3132747.3132783"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Prochlo: Strong Privacy for Analytics in the Crowd",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132769",
+          "doi": "https://doi.org/10.1145/3132747.3132769"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Strata: A Cross Media File System",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132770",
+          "doi": "https://doi.org/10.1145/3132747.3132770"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "NOVA-Fortis: A Fault-Tolerant Non-Volatile Main Memory File System",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132761",
+          "doi": "https://doi.org/10.1145/3132747.3132761"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "PebblesDB: Building Key-Value Stores using Fragmented Log-Structured Merge Trees",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132765",
+          "doi": "https://doi.org/10.1145/3132747.3132765"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "WatchIT: Who Watches Your IT Guy?",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132752",
+          "doi": "https://doi.org/10.1145/3132747.3132752"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Secure Page Fusion with VUsion: https://www.vusec.net/projects/VUsion",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132781",
+          "doi": "https://doi.org/10.1145/3132747.3132781"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "The Efficient Server Audit Problem, Deduplicated Re-execution, and the Web",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132760",
+          "doi": "https://doi.org/10.1145/3132747.3132760"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Log20: Fully Automated Optimal Placement of Log Printing Statements under Specified Overhead Threshold",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132778",
+          "doi": "https://doi.org/10.1145/3132747.3132778"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Lazy Diagnosis of In-Production Concurrency Bugs",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132767",
+          "doi": "https://doi.org/10.1145/3132747.3132767"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "CrystalNet: Faithfully Emulating Large Production Networks",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132759",
+          "doi": "https://doi.org/10.1145/3132747.3132759"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Sub-millisecond Stateful Stream Querying over Fast-evolving Linked Data",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132777",
+          "doi": "https://doi.org/10.1145/3132747.3132777"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Optimizing Big-Data Queries Using Program Synthesis",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132773",
+          "doi": "https://doi.org/10.1145/3132747.3132773"
+        },
+        {
+          "py/object": "__main__.PaperEntry",
+          "title": "Low-Latency Analytics on Colossal Data Streams with SummaryStore",
+          "authors": "",
+          "abstract": "",
+          "url": "https://dl.acm.org/doi/10.1145/3132747.3132758",
+          "doi": "https://doi.org/10.1145/3132747.3132758"
+        }
+      ]
     },
     {
       "py/object": "__main__.ProceedingEntry",

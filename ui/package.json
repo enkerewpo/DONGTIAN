@@ -4,11 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --port 3333",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "ui": "file:",
     "vue": "^3.4.29",
     "vue-router": "^4.3.3",
     "vuestic-ui": "^1.9.0"
