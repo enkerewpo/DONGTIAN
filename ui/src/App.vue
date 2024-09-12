@@ -104,7 +104,7 @@ export default {
   <VaNavbar color="#8B0012" id="navbar">
     <template #left>
       <VaNavbarItem class="logo">
-        <img src="https://portal.pku.edu.cn/portal2017/img/pkulogo_white.svg" alt="PKU" class="h-8" height="64" />
+        <!-- <img src="https://portal.pku.edu.cn/portal2017/img/pkulogo_white.svg" alt="PKU" class="h-8" height="64" /> -->
         &nbsp;&nbsp;&nbsp;
         洞天论文知识图谱系统
         &nbsp;&nbsp;&nbsp;
