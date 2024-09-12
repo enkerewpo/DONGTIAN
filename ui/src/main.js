@@ -14,6 +14,15 @@ app.use(router)
 app.use(createVuestic({
     useRouter: true,
     config: {
+        colors: {
+            presets: {
+                light: {
+                    primary: '#8B0012',
+                    myCoolColor: '#8B0012',
+                    onMyCoolColor: '#8B0012',
+                }
+            }
+        },
     },
 }))
 

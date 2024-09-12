@@ -88,7 +88,7 @@ for input_file in proceeding_input:
             else:
                 year = 2000 + suffix
             paper_entrys = proceeding_entry["paper_entrys"]
-            for p in paper_entrys[:3]:
+            for p in paper_entrys:
                 ptitle = p["title"]
                 pdoi = p["doi"]
                 print("retrieving metadata for paper: ", ptitle)
