@@ -103,7 +103,30 @@ export default {
         { title: "论文数据库", icon: "room", active: true },
       ],
       minimized: false,
+      searchTitle: "",
+      searchCCS: "",
+      filtered_paperEntries: [],
     };
+  },
+  computed: {
+    get_papers: function () {
+      if (this.searchTitle === "" && this.searchCCS === "") {
+        return this.paperEntries;
+      }
+      // first filter by title
+      let filtered = this.paperEntries.filter(p => p.title.toLowerCase().includes(this.searchTitle.toLowerCase()));
+      // then filter by CCS, some CSS maybe empty, use "" to represent
+      let filtered2 = [];
+      filtered.forEach(p => {
+        if (p.ccs) {
+          let ccs = p.ccs.toLowerCase();
+          if (ccs.includes(this.searchCCS.toLowerCase())) {
+            filtered2.push(p);
+          }
+        }
+      });
+      return filtered2;
+    },
   },
   methods: {
     toggleSidebar() {
@@ -158,7 +181,12 @@ export default {
 
     <div class="content">
       <div class="table-container">
-        <table class="va-table">
+        <!-- add a filter input row for Each column -->
+        <div class="va-input-group mb-2">
+          <VaInput placeholder="Search by title" v-model="searchTitle" class="mr-2" />
+          <VaInput placeholder="Search by CCS" v-model="searchCCS" class="mr-2" />
+        </div>
+        <table class="va-table va-table--striped">
           <thead>
             <tr>
               <th>Title</th>
@@ -167,12 +195,13 @@ export default {
               <th>DOI</th>
               <th>Category</th>
               <th>Keywords</th>
-              <th>CCS</th>
+              <th>CCS Concepts</th>
               <th>PDF</th>
+              <th>Abstract</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="p in paperEntries" :key="p.id">
+            <tr v-for="p in get_papers" :key="p.title">
               <td>{{ p.title }}</td>
               <td>{{ p.parent }}</td>
               <td>{{ p.year }}</td>
