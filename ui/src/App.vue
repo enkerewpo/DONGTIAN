@@ -248,6 +248,7 @@ export default {
 .navbar-title {
   color: white;
   font-size: 1.5rem;
+  margin-top: -9px;
   /* 默认字体大小 */
   font-weight: bold;
 }
