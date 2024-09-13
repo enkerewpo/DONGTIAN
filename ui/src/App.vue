@@ -2,12 +2,21 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useGlobalConfig } from 'vuestic-ui';
+import { useToast } from 'vuestic-ui'
 
 // Define a reference for storing the paper entries data.
 const paperEntries = ref([]);
+const { init, notify, close, closeAll } = useToast()
 
 let category_list = [];
 let map_category_to_color = {};
+
+function ui_log(str) {
+  notify({
+    title: str,
+    position: 'bottom-left',
+  })
+}
 
 function random_color(str) {
   // hash the string to a number, so that the color is determined by the string
@@ -46,7 +55,7 @@ function process(data) {
     // https://doi.org/10.1145/3385412.3385980 to 10.1145/3385412.3385980
     let doi_num = entry.doi.split("/").slice(-1)[0];
     r.push({
-      // id: entry.id,
+      id: entry.id,
       title: entry.title,
       parent: entry.parent,
       year: entry.year,
@@ -101,36 +110,39 @@ export default {
   data() {
     return {
       items: [
-        { title: "主页", icon: "dashboard" },
-        { title: "论文列表", icon: "book", active: true },
-        { title: "关于", icon: "info" },
+        { title: "主页", icon: "dashboard", url: "/" },
+        { title: "论文列表", icon: "book", active: true, url: "/papers" },
+        { title: "关于", icon: "info", url: "/about" },
       ],
       searchTitle: "",
       searchCCS: "",
       // filtered_paperEntries: [],
-      sorted_by: "", // support year and parent
+      sorted_by: "year", // support year and parent
       sorted_order: "desc", // "asc" or "desc" if possible
+      tmp_pdf_upload_id: null,
+      tmp_pdf_file: null,
     };
   },
   computed: {
     get_papers: function () {
       console.log("get_papers:" + this.searchTitle + "," + this.searchCCS + "," + this.sorted_by + "," + this.sorted_order);
       let ret = [];
+      let filtered = [];
       if (this.searchTitle === "" && this.searchCCS === "") {
         ret = this.paperEntries;
       } else {
-        // first filter by title
-        let filtered = this.paperEntries.filter(p => p.title.toLowerCase().includes(this.searchTitle.toLowerCase()));
-        // then filter by CCS, some CSS maybe empty, use "" to represent
-        let ret = [];
-        filtered.forEach(p => {
-          if (p.ccs) {
-            let ccs = p.ccs.toLowerCase();
-            if (ccs.includes(this.searchCCS.toLowerCase())) {
-              ret.push(p);
-            }
-          }
-        });
+        if (this.searchTitle === "") {
+          filtered = this.paperEntries;
+        } else {
+          filtered = this.paperEntries.filter(p => p.title.toLowerCase().includes(this.searchTitle.toLowerCase()));
+        }
+        // console.log("filtered:", filtered);
+        if (this.searchCCS === "") {
+          ret = filtered;
+        } else {
+          ret = filtered.filter(p => p.ccs.toLowerCase().includes(this.searchCCS.toLowerCase()));
+        }
+        // console.log("ret:", ret);
       }
       // then check sorted_by
       let ret2 = ret;
@@ -154,6 +166,85 @@ export default {
     openPdf: function (pdf_open_url) {
       console.log(pdf_open_url);
       window.open(pdf_open_url, '_blank');
+    },
+    uploadPdf: function (id) {
+      // click the file upload input
+      let fi = this.$refs.fileInput;
+      console.log(fi);
+      this.tmp_pdf_upload_id = id;
+      console.log("uploadPdf:", id);
+      fi.click();
+    },
+    removePdf: function (id) {
+      // remove the pdf file
+      let url = "/post_rm_pdf/" + id;
+      console.log("removing pdf file:", url);
+      axios.post(url).then(response => {
+        console.log(response);
+        ui_log("PDF已删除");
+        this.forceRefresh();
+      }).catch(error => {
+        console.error("Error removing PDF:", error);
+        ui_log("PDF删除失败");
+      });
+    },
+    getTitleById: function (id) {
+      for (let i = 0; i < this.paperEntries.length; i++) {
+        if (this.paperEntries[i].id === id) {
+          return this.paperEntries[i].title;
+        }
+      }
+      return "Unknown";
+    },
+    onFileChange: function (e) {
+      this.tmp_pdf_file = e.target.files[0];
+      console.log("onFileChange:", this.tmp_pdf_file);
+      // upload the file, POST["pdf"] = pdf_binary_data
+      let id = this.tmp_pdf_upload_id;
+      let url = "/post_pdf/" + id;
+      console.log("uploading file to:", url);
+      let reader = new FileReader();
+      reader.readAsArrayBuffer(this.tmp_pdf_file);
+      let formData = new FormData();
+      formData.append("pdf", this.tmp_pdf_file);
+      axios.post(url, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then(response => {
+        console.log(response);
+        ui_log("PDF已上传");
+        this.forceRefresh();
+      }).catch(error => {
+        console.error("Error uploading PDF:", error);
+        ui_log("PDF上传失败");
+      });
+    },
+    triggerGen: function (id) {
+      // trigger the GEN process for the paper
+      // api url: /api/post_gen/{id}
+      const url = "/post_gen/" + id;
+      axios.post(url).then(response => {
+        console.log(response);
+        ui_log("GPT生成已完成");
+        this.forceRefresh();
+      }).catch(error => {
+        console.error("Error triggering GEN process:", error);
+        ui_log("GPT生成失败");
+      });
+    },
+    removeGen: function (id) {
+      // remove the GEN file
+      let url = "/post_rm_gen/" + id;
+      console.log("removing GEN file:", url);
+      axios.post(url).then(response => {
+        console.log(response);
+        ui_log("GEN已删除");
+        this.forceRefresh();
+      }).catch(error => {
+        console.error("Error removing GEN:", error);
+        ui_log("GEN删除失败");
+      });
     },
     openAbstract: function (abstract_open_url) {
       console.log(abstract_open_url);
@@ -196,6 +287,18 @@ export default {
         return "arrow_drop_down";
       }
     },
+    forceRefresh: function () {
+      console.log("forceRefresh");
+      axios.defaults.baseURL = '/api';
+      axios.get('get_paper_entries').then(response => {
+        let r = process(response.data);
+        this.paperEntries = r;
+        ui_log("已刷新");
+      }).catch(error => {
+        console.error("Error fetching paper entries:", error);
+        ui_log("刷新失败");
+      });
+    },
   },
 };
 </script>
@@ -233,8 +336,9 @@ export default {
       <div class="table-container">
         <!-- add a filter input row for Each column -->
         <div class="va-input-group mb-2">
-          <VaInput placeholder="Search by title" v-model="searchTitle" class="mr-2" />
-          <VaInput placeholder="Search by CCS" v-model="searchCCS" class="mr-2" />
+          <VaInput placeholder="按标题查询" v-model="searchTitle" class="mr-2" />
+          <VaInput placeholder="按CCS查询" v-model="searchCCS" class="mr-2" />
+          <VaButton @click="forceRefresh()" preset="primary" class="" border-color="primary" icon="refresh"></VaButton>
         </div>
         <table class="va-table va-table--striped">
           <thead class="noselect">
@@ -251,6 +355,8 @@ export default {
               <th>CCS Concepts</th>
               <th>PDF</th>
               <th>Abstract</th>
+              <th>PDF CTRL</th>
+              <th>GEN</th>
             </tr>
           </thead>
           <tbody>
@@ -272,13 +378,23 @@ export default {
                 <VaButton v-else size="small" disabled>PDF</VaButton>
               </td>
               <td>
-                <VaButton size="small" @click="openAbstract(p.abstract_open_url)">Abstract</VaButton>
+                <VaButton size="small" @click="openAbstract(p.abstract_open_url)">摘要</VaButton>
+              </td>
+              <td>
+                <VaButton size="small" @click="uploadPdf(p.id)" class="mr-1">+</VaButton>
+                <VaButton size="small" @click="removePdf(p.id)" class="mt-1">-</VaButton>
+              </td>
+              <td>
+                <VaButton size="small" @click="triggerGen(p.id)" class="mr-1">GEN</VaButton>
+                <VaButton size="small" @click="removeGen(p.id)" class="mt-1">-</VaButton>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
+
+    <input type="file" style="display: none;" ref="fileInput" @change="onFileChange" accept="application/pdf" />
 
   </div>
 </template>

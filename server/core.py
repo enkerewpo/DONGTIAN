@@ -2,7 +2,7 @@ from wsgiref.simple_server import make_server
 from pyramid.config import Configurator
 from pyramid.response import Response
 import sqlite3
-
+from gen import *
 
 db_file = "core.db"
 db_table = "paper_entry"
@@ -24,6 +24,7 @@ def get_pdf(request):
     con.close()
     return Response(pdf, content_type='application/pdf')
 
+
 def get_abstract(request):
     # get the id of the paper
     id = request.matchdict['id']
@@ -35,6 +36,7 @@ def get_abstract(request):
     abstract = cur.fetchone()[0]
     con.close()
     return Response(abstract)
+
 
 def get_paper_entries(request):
     # open the database and get all the entries
@@ -68,6 +70,46 @@ def get_paper_entries(request):
     return Response(json=json_data)
 
 
+def post_pdf(request):
+    """ upload a pdf file """
+    # get the id of the paper
+    id = request.matchdict['id']
+    # get the pdf file
+    pdf = request.POST['pdf'].file.read()
+    # open the database and get the entry
+    con = sqlite3.connect(db_file)
+    cur = con.cursor()
+    cur.execute(
+        f"UPDATE {db_table} SET pdf = ? WHERE id = ?", (pdf, id))
+    con.commit()
+    con.close()
+    return Response("pdf uploaded, id: " + id + ", size: " + str(len(pdf)) + " bytes")
+
+def post_rm_pdf(request):
+    """ remove a pdf file """
+    # get the id of the paper
+    id = request.matchdict['id']
+    # open the database and get the entry
+    con = sqlite3.connect(db_file)
+    cur = con.cursor()
+    cur.execute(
+        f"UPDATE {db_table} SET pdf = NULL WHERE id = ?", (id,))
+    con.commit()
+    con.close()
+    return Response("pdf removed, id: " + id)
+
+def post_gen(request):
+    """ trigger to generate keywords, category, css, etc using GPT for paper with id """
+    id = request.matchdict['id']
+    api_gen_by_id(id)
+    return Response("gen triggered for id: " + id)
+
+def post_rm_gen(request):
+    """ remove the generated keywords, category, css, etc for paper with id """
+    id = request.matchdict['id']
+    api_rm_gen_by_id(id)
+    return Response("gen removed for id: " + id)
+
 if __name__ == '__main__':
     with Configurator() as config:
 
@@ -82,6 +124,18 @@ if __name__ == '__main__':
 
         config.add_route('get_abstract', '/get_abstract/{id}')
         config.add_view(get_abstract, route_name='get_abstract')
+
+        config.add_route('post_pdf', '/post_pdf/{id}')
+        config.add_view(post_pdf, route_name='post_pdf')
+
+        config.add_route('post_gen', '/post_gen/{id}')
+        config.add_view(post_gen, route_name='post_gen')
+
+        config.add_route('post_rm_pdf', '/post_rm_pdf/{id}')
+        config.add_view(post_rm_pdf, route_name='post_rm_pdf')
+
+        config.add_route('post_rm_gen', '/post_rm_gen/{id}')
+        config.add_view(post_rm_gen, route_name='post_rm_gen')
 
         app = config.make_wsgi_app()
 

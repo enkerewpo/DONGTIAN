@@ -14,7 +14,7 @@ print("Database opened successfully, db file: ", full_path)
 
 OPENAI_URL = None
 OPENAI_KEY = None
-N = 2200
+N = 3000
 
 with open("openai.json", "r") as f:
     data = json.load(f)
@@ -63,6 +63,15 @@ def get_papers_with_pdf(con, table):
     return data
 
 
+def get_os_tmp_folder():
+    # if windows, use C:\Windows\Temp
+    # if linux, use /tmp
+    if os.name == "nt":
+        return os.path.join(os.environ["SystemRoot"], "Temp")
+    else:
+        return "/tmp"
+
+
 def update_full_text_db(con, table, paper):
     # # if the db already has the full text, then skip
     cur = con.cursor()
@@ -73,21 +82,36 @@ def update_full_text_db(con, table, paper):
     if text is not None:
         print(f"full text already exists for {
               paper[0]}, preview: {text[:20]}")
-        return
-    # first read the pdf file
-    id, doi = paper
-    pdf_path = get_pdf_path(doi)
-    print(pdf_path)
+        return True
+    # first check whether we have the blob in the database
+    cur.execute(f"SELECT pdf FROM {table} WHERE id = ?", (paper[0],))
+    pdf = cur.fetchone()
+    assert pdf is not None
+    pdf = pdf[0]
+    if pdf is None:
+        print(f"pdf is None for {paper[0]}")
+        return False
+
+    # export the binary to systen tmp folder/tmp.pdf
+    tmp_folder = get_os_tmp_folder()
+    pdf_path = os.path.join(tmp_folder, "tmp.pdf")
+    print("pdf path: ", pdf_path)
+    with open(pdf_path, "wb") as f:
+        f.write(pdf)
+    # parse the pdf
     parsed_text = ""
     import pypdf
     pdf = pypdf.PdfReader(pdf_path)
     for page in pdf.pages:
         parsed_text += page.extract_text()
     # add the parsed text into the database column text
+    print(f"parsed text: {parsed_text[:100]}")
     cur = con.cursor()
-    cur.execute(f"UPDATE {table} SET text = ? WHERE id = ?", (parsed_text, id))
+    cur.execute(f"UPDATE {table} SET text = ? WHERE id = ?",
+                (parsed_text, paper[0]))
     con.commit()
     cur.close()
+    return True
 
 
 def update_abstract_db(con, table, paper):
@@ -110,6 +134,8 @@ def update_abstract_db(con, table, paper):
     response = get_llm_response(text[:N], history)
     response = response.strip()
     response = response.replace("*", "")
+    response = response.replace("\n", "")
+    response = response.replace("\r", "")
     print(f"abstract: {response}")
     # add the abstract into the database
     cur.execute(
@@ -157,6 +183,8 @@ def update_category_db(con, table, paper):
     response = get_llm_response(text[:N], history)
     response = response.strip()
     response = response.replace("*", "")
+    response = response.replace("\n", "")
+    response = response.replace("\r", "")
     print(f"category: {response}")
     # add the category into the database
     cur.execute(
@@ -193,13 +221,14 @@ def update_ccs_db(con, table, paper):
     response = response.replace("*", "")
     response = response.replace("CCS Concepts:", "")
     response = response.replace("`", "")
+    response = response.replace("\n", "")
+    response = response.replace("\r", "")
     print(f"ccs: {response}")
     # add the ccs into the database
     cur.execute(
         f"UPDATE {table} SET gen_ccs = ? WHERE id = ?", (response, paper[0]))
     con.commit()
     cur.close()
-
 
 
 def update_keywords_db(con, table, paper):
@@ -226,6 +255,8 @@ def update_keywords_db(con, table, paper):
     response = get_llm_response(text[:N], history)
     response = response.strip()
     response = response.replace("*", "")
+    response = response.replace("\n", "")
+    response = response.replace("\r", "")
     print(f"keywords: {response}")
     # add the keywords into the database
     cur.execute(
@@ -240,6 +271,34 @@ def get_full_text_db(con, table, paper):
     text = cur.fetchone()[0]
     cur.close()
     return text
+
+
+def api_gen_by_id(id):
+    """run the generation pipeline for a paper by id"""
+    print("running generation pipeline for paper id: ", id)
+    paper = (id, "")
+    con = sqlite3.connect(full_path)
+    ok = update_full_text_db(con, db_table, paper)
+    if not ok:
+        return False
+    update_abstract_db(con, db_table, paper)
+    update_keywords_db(con, db_table, paper)
+    update_category_db(con, db_table, paper)
+    update_ccs_db(con, db_table, paper)
+    con.close()
+    return True
+
+
+def api_rm_gen_by_id(id):
+    """clear the generated fields for a paper by id"""
+    print("clearing generated fields for paper id: ", id)
+    con = sqlite3.connect(full_path)
+    cur = con.cursor()
+    cur.execute(f"UPDATE {
+                db_table} SET abstract = NULL, gen_keywords = NULL, gen_category = NULL, gen_ccs = NULL WHERE id = ?", (id,))
+    con.commit()
+    con.close()
+    return True
 
 
 if __name__ == "__main__":
