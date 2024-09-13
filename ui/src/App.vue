@@ -63,15 +63,6 @@ function process(data) {
     });
   }
 
-  // sort by has_pdf, then by year
-  r.sort((a, b) => {
-    if (a.has_pdf && !b.has_pdf) return -1;
-    if (!a.has_pdf && b.has_pdf) return 1;
-    if (a.year < b.year) return 1;
-    if (a.year > b.year) return -1;
-    return 0;
-  });
-
   return r;
 }
 
@@ -116,42 +107,96 @@ export default {
       ],
       searchTitle: "",
       searchCCS: "",
-      filtered_paperEntries: [],
+      // filtered_paperEntries: [],
+      sorted_by: "", // support year and parent
+      sorted_order: "desc", // "asc" or "desc" if possible
     };
   },
   computed: {
     get_papers: function () {
+      console.log("get_papers:" + this.searchTitle + "," + this.searchCCS + "," + this.sorted_by + "," + this.sorted_order);
+      let ret = [];
       if (this.searchTitle === "" && this.searchCCS === "") {
-        return this.paperEntries;
-      }
-      // first filter by title
-      let filtered = this.paperEntries.filter(p => p.title.toLowerCase().includes(this.searchTitle.toLowerCase()));
-      // then filter by CCS, some CSS maybe empty, use "" to represent
-      let filtered2 = [];
-      filtered.forEach(p => {
-        if (p.ccs) {
-          let ccs = p.ccs.toLowerCase();
-          if (ccs.includes(this.searchCCS.toLowerCase())) {
-            filtered2.push(p);
+        ret = this.paperEntries;
+      } else {
+        // first filter by title
+        let filtered = this.paperEntries.filter(p => p.title.toLowerCase().includes(this.searchTitle.toLowerCase()));
+        // then filter by CCS, some CSS maybe empty, use "" to represent
+        let ret = [];
+        filtered.forEach(p => {
+          if (p.ccs) {
+            let ccs = p.ccs.toLowerCase();
+            if (ccs.includes(this.searchCCS.toLowerCase())) {
+              ret.push(p);
+            }
           }
+        });
+      }
+      // then check sorted_by
+      let ret2 = ret;
+      if (this.sorted_by === "year") {
+        if (this.sorted_order === "desc") {
+          ret2.sort((a, b) => parseInt(b.year) - parseInt(a.year));
+        } else {
+          ret2.sort((a, b) => parseInt(a.year) - parseInt(b.year));
         }
-      });
-      return filtered2;
+      } else {
+        // default sort by has pdf
+        ret2.sort((a, b) => b.has_pdf - a.has_pdf);
+      }
+      return ret2;
     },
   },
   methods: {
-    toggleSidebar() {
+    toggleSidebar: function () {
       this.minimized = !this.minimized;
     },
-    openPdf(pdf_open_url) {
+    openPdf: function (pdf_open_url) {
       console.log(pdf_open_url);
       window.open(pdf_open_url, '_blank');
     },
-    openAbstract(abstract_open_url) {
+    openAbstract: function (abstract_open_url) {
       console.log(abstract_open_url);
       window.open(abstract_open_url, '_blank');
     },
-  }
+    sort_year_next: function () {
+      // state transition: "" -> "year_desc" -> "year_desc" -> ""
+      if (this.sorted_by === "") {
+        this.sorted_by = "year";
+        this.sorted_order = "desc";
+      } else if (this.sorted_by === "year") {
+        if (this.sorted_order === "desc") {
+          this.sorted_order = "asc";
+        } else {
+          this.sorted_by = "";
+          this.sorted_order = "desc";
+        }
+      }
+    },
+    sort_year_state: function () {
+      // 1. ""
+      // 2. "year_desc"
+      // 3. "year_asc"
+      if (this.sorted_by === "") {
+        return 1;
+      } else if (this.sorted_by === "year") {
+        if (this.sorted_order === "desc") {
+          return 2;
+        } else {
+          return 3;
+        }
+      }
+    },
+    state2icon: function (state) {
+      if (state === 1) {
+        return "";
+      } else if (state === 2) {
+        return "arrow_drop_up";
+      } else if (state === 3) {
+        return "arrow_drop_down";
+      }
+    },
+  },
 };
 </script>
 
@@ -192,11 +237,14 @@ export default {
           <VaInput placeholder="Search by CCS" v-model="searchCCS" class="mr-2" />
         </div>
         <table class="va-table va-table--striped">
-          <thead>
+          <thead class="noselect">
             <tr>
               <th>Title</th>
               <th>Parent</th>
-              <th>Year</th>
+              <th id="year" @click="sort_year_next()" style="cursor: pointer;">
+                <span>Year</span>
+                <VaIcon v-if="sorted_by === 'year'" :name="state2icon(sort_year_state())" />
+              </th>
               <th>DOI</th>
               <th>Category</th>
               <th>Keywords</th>
@@ -236,6 +284,21 @@ export default {
 </template>
 
 <style scoped>
+.noselect {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Old versions of Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+}
+
 /* 样式调整 */
 .logo {
   display: flex;

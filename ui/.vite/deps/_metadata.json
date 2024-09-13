@@ -1,0 +1,31 @@
+{
+  "hash": "4a7f3ebc",
+  "configHash": "c3b6134d",
+  "lockfileHash": "2c1da27e",
+  "browserHash": "348ac7af",
+  "optimized": {
+    "vuestic-ui": {
+      "src": "../../node_modules/vuestic-ui/dist/es/main.js",
+      "file": "vuestic-ui.js",
+      "fileHash": "820e88f5",
+      "needsInterop": false
+    },
+    "vue": {
+      "src": "../../node_modules/vue/dist/vue.runtime.esm-bundler.js",
+      "file": "vue.js",
+      "fileHash": "2c2d11d0",
+      "needsInterop": false
+    },
+    "vue-router": {
+      "src": "../../node_modules/vue-router/dist/vue-router.mjs",
+      "file": "vue-router.js",
+      "fileHash": "0a72ae8e",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-7H3D676B": {
+      "file": "chunk-7H3D676B.js"
+    }
+  }
+}
