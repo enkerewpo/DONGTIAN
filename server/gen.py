@@ -65,11 +65,15 @@ def get_papers_with_pdf(con, table):
 
 def update_full_text_db(con, table, paper):
     # # if the db already has the full text, then skip
-    # cur = con.cursor()
-    # cur.execute(f"SELECT text FROM {table} WHERE id = ?", (paper[0],))
-    # text = cur.fetchone()
-    # if text is not None:
-    #     return
+    cur = con.cursor()
+    cur.execute(f"SELECT text FROM {table} WHERE id = ?", (paper[0],))
+    text = cur.fetchone()
+    assert text is not None
+    text = text[0]
+    if text is not None:
+        print(f"full text already exists for {
+              paper[0]}, preview: {text[:20]}")
+        return
     # first read the pdf file
     id, doi = paper
     pdf_path = get_pdf_path(doi)
@@ -88,6 +92,15 @@ def update_full_text_db(con, table, paper):
 
 def update_abstract_db(con, table, paper):
     cur = con.cursor()
+    # if the db already has the abstract, then skip
+    cur.execute(f"SELECT abstract FROM {table} WHERE id = ?", (paper[0],))
+    abstract = cur.fetchone()
+    assert abstract is not None
+    abstract = abstract[0]
+    if abstract is not None:
+        print(f"abstract already exists for {
+              paper[0]}, preview: {abstract[:20]}")
+        return
     cur.execute(f"SELECT text FROM {table} WHERE id = ?", (paper[0],))
     text = cur.fetchone()[0]
     # get the abstract from the full text by sending it to the GPT model
@@ -123,7 +136,16 @@ def update_category_db(con, table, paper):
         "Verification",
         "Serverless",
     ]
-
+    # if the db already has the category, then skip
+    cur = con.cursor()
+    cur.execute(f"SELECT gen_category FROM {table} WHERE id = ?", (paper[0],))
+    category = cur.fetchone()
+    assert category is not None
+    category = category[0]
+    if category is not None:
+        print(f"category already exists for {
+            paper[0]}, preview: {category[:20]}")
+        return
     # get the full text
     cur = con.cursor()
     cur.execute(f"SELECT text FROM {table} WHERE id = ?", (paper[0],))
@@ -144,6 +166,16 @@ def update_category_db(con, table, paper):
 
 
 def update_ccs_db(con, table, paper):
+    # if the db already has the ccs, then skip
+    cur = con.cursor()
+    cur.execute(f"SELECT gen_ccs FROM {table} WHERE id = ?", (paper[0],))
+    ccs = cur.fetchone()
+    assert ccs is not None
+    ccs = ccs[0]
+    if ccs is not None:
+        print(f"ccs already exists for {
+            paper[0]}, preview: {ccs[0][:10]}")
+        return
     cur = con.cursor()
     # get the full text
     cur.execute(f"SELECT text FROM {table} WHERE id = ?", (paper[0],))
@@ -165,15 +197,22 @@ def update_ccs_db(con, table, paper):
     # add the ccs into the database
     cur.execute(
         f"UPDATE {table} SET gen_ccs = ? WHERE id = ?", (response, paper[0]))
+    con.commit()
+    cur.close()
+
 
 
 def update_keywords_db(con, table, paper):
     # if the db already has the keywords, then skip
     cur = con.cursor()
-    # cur.execute(f"SELECT gen_keywords FROM {table} WHERE id = ?", (paper[0],))
-    # keywords = cur.fetchone()
-    # if keywords is not None:
-    #     return
+    cur.execute(f"SELECT gen_keywords FROM {table} WHERE id = ?", (paper[0],))
+    keywords = cur.fetchone()
+    assert keywords is not None
+    keywords = keywords[0]
+    if keywords is not None:
+        print(f"keywords already exists for {
+            paper[0]}, preview: {keywords[:20]}")
+        return
     # get the full text
     cur.execute(f"SELECT text FROM {table} WHERE id = ?", (paper[0],))
     text = cur.fetchone()[0]
