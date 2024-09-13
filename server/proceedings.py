@@ -40,6 +40,8 @@ print("Database opened successfully, db file: ", full_path)
 
 
 def insert_or_update(con, table, caption, year, ptitle, pdoi, authors, reference_raw, pdf=None):
+    # if ptitle has "'" then we need to remove it
+    ptitle = ptitle.replace("'", "")
     cur = con.cursor()
     # if exists, update it
     # if not, insert it
@@ -75,6 +77,50 @@ def generate_pdf_filename(title):
     return title
 
 
+def edit_distance(a, b):
+    if len(a) > len(b):
+        a, b = b, a
+    current_row = range(len(a) + 1)
+    for i, c1 in enumerate(b):
+        previous_row, current_row = current_row, [
+            i + 1] + [0] * len(a)
+        for j, c2 in enumerate(a):
+            insertions = previous_row[j + 1] + 1
+            deletions = current_row[j] + 1
+            substitutions = previous_row[j] + (c1 != c2)
+            current_row[j + 1] = min(insertions,
+                                     deletions, substitutions)
+    return current_row[-1]
+
+
+def calc_similarity(a, b):
+    a = a.lower()
+    b = b.lower()
+    a = a.replace(":", "")
+    a = a.replace("?", "")
+    a = a.replace("!", "")
+    b = b.replace(":", "")
+    b = b.replace("?", "")
+    b = b.replace("!", "")
+    a = a.split(" ")
+    b = b.split(" ")
+    a = "".join(a)
+    b = "".join(b)
+    a_len = len(a)
+    b_len = len(b)
+    if a_len > b_len:
+        longer = a
+        shorter = b
+    else:
+        longer = b
+        shorter = a
+    longer_len = len(longer)
+    if longer_len == 0:
+        return 1.0
+    return (longer_len - edit_distance(longer, shorter)) / \
+        float(longer_len)
+
+
 for input_file in proceeding_input:
     print("processing: ", input_file)
     with open(input_file, "r") as f:
@@ -103,21 +149,27 @@ for input_file in proceeding_input:
                     # /works?query.title=room+at+the+bottom
                     # ask crossref for the paper metadata using title words
                     # to lower case
-                    title_words = ptitle.lower()
-                    title_words = ptitle.split(" ")
-                    for i in range(len(title_words)):
-                        title_words[i] = title_words[i].lower()
-                        title_words[i] = title_words[i].replace(":", "")
-                        title_words[i] = title_words[i].replace("?", "")
-                        title_words[i] = title_words[i].replace("!", "")
-                    # just use first 5 words
-                    title_words = title_words
-                    title_words = "+".join(title_words)
-                    # ask crossref for the paper metadata
-                    request_url = f"https://api.crossref.org/works?query.title={
-                        title_words}"
-                    print("[DEBUG] request_url: ", request_url)
-                    response = requests.get(request_url)
+                    # title_words = ptitle.lower()
+                    # title_words = ptitle.split(" ")
+                    # for i in range(len(title_words)):
+                    #     title_words[i] = title_words[i].lower()
+                    #     title_words[i] = title_words[i].replace(":", "")
+                    #     title_words[i] = title_words[i].replace("?", "")
+                    #     title_words[i] = title_words[i].replace("!", "")
+                    # # just use first 5 words
+                    # title_words = title_words
+                    # title_words = "+".join(title_words)
+                    # # ask crossref for the paper metadata
+                    # request_url = f"https://api.crossref.org/works?query.title={
+                    #     title_words}"
+                    # print("[DEBUG] request_url: ", request_url)
+                    # response = requests.get(request_url)
+
+                    # just insert the basic information into the database
+                    # and skip the rest
+                    insert_or_update(
+                        con=con, table=db_table, caption=caption, year=year, ptitle=ptitle, pdoi=pdoi, authors="", reference_raw="")
+                    continue
                 else:
                     print("retrieving metadata for paper: ", ptitle)
                     request_url = f"https://api.crossref.org/works/{pdoi}"
@@ -128,7 +180,8 @@ for input_file in proceeding_input:
                     data = response.json()
                     message_type = data["message-type"]
                     if message_type == "work-list":
-                        data = data["message"]["items"][0]
+                        # data = data["message"]["items"][0]
+                        assert false, "message-type is work-list, not work"
                     else:
                         data = data["message"]
                     # print(f"[DEBUG] data: {data}")
@@ -139,6 +192,19 @@ for input_file in proceeding_input:
                         pdoi = doi_url_crossref
                         print(f"set pdoi to {pdoi}")
                     p_type = data["type"]
+                    p_title = data["title"][0]
+
+                    # check similarity between p_title and ptitle
+                    # if not similar just skip
+                    similarity = calc_similarity(p_title, ptitle)
+                    if similarity < 0.95:
+                        print(f"similarity too low: {similarity}, title: {
+                            ptitle}, crossref title: {p_title}")
+                        continue
+
+                    print(f"similarity: {similarity}, title: {
+                          ptitle}, crossref title: {p_title}")
+
                     p_created = data["created"]
                     year = p_created["date-parts"][0][0]
                     authors = data["author"]
@@ -158,7 +224,7 @@ for input_file in proceeding_input:
                         reference_raw = data["reference"]
                         reference_raw_str = str(reference_raw)
                     else:
-                        reference_raw_str = ""                     
+                        reference_raw_str = ""
                     # download the pdf
                     # doi like https://doi.org/10.1145/3447928.3456709
                     # doi nums are like 10.1145/3447928.3456709
