@@ -111,7 +111,8 @@ export default {
     return {
       items: [
         { title: "主页", icon: "dashboard" },
-        { title: "论文数据库", icon: "room", active: true },
+        { title: "论文列表", icon: "book", active: true },
+        { title: "关于", icon: "info" },
       ],
       searchTitle: "",
       searchCCS: "",
@@ -169,12 +170,12 @@ export default {
   <div class="app">
 
     <div class="sidebar-container">
-      <VaSidebar :minimized="minimized" width="11rem" minimized-width="64px">
+      <VaSidebar :minimized="minimized" width="10rem" minimized-width="64px">
         <template v-for="item in items" :key="item.title">
           <VaSidebarItem :active="item.active">
             <VaSidebarItemContent>
               <VaIcon :name="item.icon" />
-              <VaSidebarItemTitle>
+              <VaSidebarItemTitle style="font-size: 0.8rem;">
                 {{ item.title }}
               </VaSidebarItemTitle>
             </VaSidebarItemContent>
@@ -265,6 +266,7 @@ export default {
 /* 手机屏幕上的调整 */
 @media (max-width: 768px) {
   .navbar-title {
+    margin: auto;
     font-size: 1.4rem;
   }
 
@@ -273,8 +275,7 @@ export default {
   }
 
   .logo {
-    padding-left: 10px;
-    padding-right: 10px;
+    padding: auto;
   }
 }
 
