@@ -25,7 +25,7 @@ function random_color(str) {
 }
 
 function process(data) {
-  console.log(data);
+  // console.log(data);
   let r = [];
   category_list = [];
   for (let i = 0; i < data.length; i++) {
@@ -78,6 +78,12 @@ function process(data) {
 export default {
   setup() {
     const globalConfig = useGlobalConfig();
+    const minimized = ref(false);
+
+    const checkScreenWidth = () => {
+      minimized.value = window.innerWidth < 768;
+      console.log("minimized", minimized.value);
+    };
 
     // Fetch the paper entries data when the component is mounted.
     onMounted(async () => {
@@ -89,11 +95,16 @@ export default {
       } catch (error) {
         console.error("Error fetching paper entries:", error);
       }
+
+      checkScreenWidth();
+      window.addEventListener('resize', checkScreenWidth);
+
     });
 
     return {
       globalConfig,
       paperEntries,
+      minimized,
     };
   },
   data() {
@@ -102,7 +113,6 @@ export default {
         { title: "主页", icon: "dashboard" },
         { title: "论文数据库", icon: "room", active: true },
       ],
-      minimized: false,
       searchTitle: "",
       searchCCS: "",
       filtered_paperEntries: [],
@@ -148,16 +158,10 @@ export default {
   <VaNavbar color="#8B0012" id="navbar">
     <template #left>
       <VaNavbarItem class="logo">
-        <!-- <img src="https://portal.pku.edu.cn/portal2017/img/pkulogo_white.svg" alt="PKU" class="h-8" height="64" /> -->
         &nbsp;&nbsp;&nbsp;
-        洞天论文知识图谱系统
+        <span class="navbar-title">洞天论文知识图谱系统</span>
         &nbsp;&nbsp;&nbsp;
-        <span style="font-size: 0.8rem; color: white;">powered by wheatfox(enkerewpo@hotmail.com)</span>
-      </VaNavbarItem>
-    </template>
-    <template #right>
-      <VaNavbarItem class="hidden sm:block">
-        使用说明
+        <span class="navbar-subtitle">powered by wheatfox(enkerewpo@hotmail.com)</span>
       </VaNavbarItem>
     </template>
   </VaNavbar>
@@ -231,13 +235,47 @@ export default {
 </template>
 
 <style scoped>
+/* 样式调整 */
 .logo {
-  font-weight: 600;
-  font-size: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  /* 左对齐 */
+  margin-left: 20px;
 }
 
-#navbar {
-  height: 6rem;
+.navbar-title {
+  color: white;
+  font-size: 1.5rem;
+  /* 默认字体大小 */
+  font-weight: bold;
+}
+
+.navbar-subtitle {
+  font-size: 0.6rem;
+  /* 字体更小 */
+  color: white;
+  text-align: left;
+  /* 左对齐 */
+  margin-left: 3px;
+  margin-top: -12px;
+  /* 与标题稍微间隔 */
+}
+
+/* 手机屏幕上的调整 */
+@media (max-width: 768px) {
+  .navbar-title {
+    font-size: 1.4rem;
+  }
+
+  .navbar-subtitle {
+    display: none;
+  }
+
+  .logo {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
 }
 
 .app {
