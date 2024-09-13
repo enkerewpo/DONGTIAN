@@ -56,27 +56,81 @@ class ProceedingSource:
 sosp_source = ProceedingSource(
     'https://dl.acm.org/conference/sosp/proceedings', 'SOSP')
 
-# first get the proceeding entries
+osdi_source = ProceedingSource(
+    'https://dl.acm.org/conference/osdi/proceedings', 'OSDI')
+
+global_proceeding_source = [
+    osdi_source,
+    sosp_source
+]
 
 
-global_proceeding_source = [sosp_source]
+def dump_json(ps):
+    # save the data with pretty print, caption to non-capitalize
+    prefix = ps.caption.lower()
+    with open(f'{prefix}_source.json', 'w', encoding='utf-8') as f:
+        f.write(jsonpickle.dumps(ps, indent=2))
 
 
-def get_proceeding_entries(ps):
-    page = requests.get(ps.url)
-    soup = BeautifulSoup(page.content, 'html.parser')
-    links = soup.find_all('a')
+def get_proceeding_entries(ps, caption):
+    # page = requests.get(ps.url)
+    # soup = BeautifulSoup(page.content, 'html.parser')
+    # links = soup.find_all('a')
+    # for link in links:
+    #     match = re.match(rf'{caption} \'\d\d:', link.text)
+    #     if match:
+    #         title = link.text
+    #         url = link['href']
+    #         # if url is relative, make it absolute
+    #         if url.startswith('/'):
+    #             url = ps.get_base_url() + url
+    #         ps.add_proceeding_entry(ProceedingEntry(title, 1900, url))
+
+    # since we need to click "View All Proceedings", we use selenium
+    driver = webdriver.Firefox()
+    driver.get(ps.url)
+
+    # wait for the page to load fully!
+    import time
+    time.sleep(2)
+
+    # hide CybotCookiebotDialog
+    driver.execute_script(
+        'document.getElementById("CybotCookiebotDialog").style.display = "none";')
+    # hide  <div class="responsive-menu-container">
+    driver.execute_script(
+        'document.getElementsByClassName("responsive-menu-container")[0].style.display = "none";')
+
+    # find all elements with class btn
+    all_btns = driver.find_elements(By.CLASS_NAME, 'btn')
+    for btn in all_btns:
+        print(f'Found button {btn.text}')
+        if btn.text == 'View All Proceedings':
+            btn.click()
+            break
+
+    # wait 1s for the page to load
+    import time
+    time.sleep(1)
+
+    # find all <a> with {caption} "Proceedings" and "'" in the text
+    links = driver.find_elements(
+        By.XPATH, f'//a[contains(text(), "{caption}")]')
     for link in links:
-        if re.match(r'SOSP \'\d\d:', link.text):
-            title = link.text
-            url = link['href']
-            # if url is relative, make it absolute
-            if url.startswith('/'):
-                url = ps.get_base_url() + url
-            ps.add_proceeding_entry(ProceedingEntry(title, 1900, url))
+        title = link.text
+        # title should contains "'" and "Proceedings"
+        if "'" not in title or "Proceedings" not in title:
+            continue
+        url = link.get_attribute('href')
+        print(f'found proceeding {title} {url}')
+        # if url is relative, make it absolute
+        if url.startswith('/'):
+            url = ps.get_base_url() + url
+        ps.add_proceeding_entry(ProceedingEntry(title, 0, url))
+        dump_json(ps)
 
 
-def get_paper_entries(pe):
+def get_paper_entries(pe, ps):
     print(f'Getting paper entries for {pe.title} {pe.year} {pe.url}')
     driver = webdriver.Firefox()
     driver.get(pe.url)
@@ -115,44 +169,45 @@ def get_paper_entries(pe):
         driver.execute_script('arguments[0].click();', session_link)
         # wait 3 seconds for the page to load, use python sleep instead of selenium wait
         import time
-        time.sleep(3)
+        time.sleep(5)
 
     issue_items = driver.find_elements(By.CLASS_NAME, 'issue-item')
     for issue_item in issue_items:
         title_h5 = issue_item.find_element(By.CLASS_NAME, 'issue-item__title')
         title_text = title_h5.text
         print(f'Found paper {title_text}, processing...', end='')
-        detail = issue_item.find_element(By.CLASS_NAME, 'issue-item__detail')
-        doi_url = detail.find_element(
-            By.TAG_NAME, 'a').get_attribute('href')
+        try:
+            detail = issue_item.find_element(
+                By.CLASS_NAME, 'issue-item__detail')
+        except:
+            print('no detail found...', end='')
+            continue
+        try:
+            doi_url = detail.find_element(
+                By.TAG_NAME, 'a').get_attribute('href')
+        except:
+            print('no doi found...', end='')
+            doi_url = ''
         # inner we have <a> with href to the paper
-        title_url = title_h5.find_element(
-            By.TAG_NAME, 'a').get_attribute('href')
+        try:
+            title_url = title_h5.find_element(
+                By.TAG_NAME, 'a').get_attribute('href')
+        except:
+            print('no title url found...', end='')
+            title_url = ''
         # add paper entry
         pe.add_paper_entry(PaperEntry(title_text, '', '', title_url, doi_url))
         print(f' done, doi: {doi_url}')
+        dump_json(ps)
 
     print(f'Found {len(pe.paper_entrys)} paper entries')
     driver.close()
 
 
-# get_proceeding_entries(sosp_source)
-
-# print(f'Found {len(sosp_source.proceeding_entrys)} proceeding entries')
-
-# # get recent 5 proceeding entries
-# for pe in sosp_source.proceeding_entrys[:4]:
-#     get_paper_entries(pe)
-#     # save the data with pretty print
-#     with open('sosp_source.json', 'w') as f:
-#         f.write(jsonpickle.dumps(sosp_source, indent=2))
-
 for ps in global_proceeding_source:
-    get_proceeding_entries(ps)
+    get_proceeding_entries(ps, ps.caption)
     print(f'Found {len(ps.proceeding_entrys)} proceeding entries')
-    for pe in ps.proceeding_entrys:
-        get_paper_entries(pe)
-        # save the data with pretty print, caption to non-capitalize
-        prefix = ps.caption.lower()
-        with open(f'{prefix}_source.json', 'w') as f:
-            f.write(jsonpickle.dumps(ps, indent=2))
+    for pe in ps.proceeding_entrys[:5]:
+        get_paper_entries(pe, ps)
+        print(f'Found {len(pe.paper_entrys)} paper entries')
+        dump_json(ps)

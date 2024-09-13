@@ -4,9 +4,17 @@ import sqlite3
 import requests
 import bs4
 
-proceeding_input = [
-    "sosp_source.json"
-]
+# proceeding_input = [
+#     "sosp_source.json"
+# ]
+
+# find all json files in the directory ending with _source.json
+proceeding_input = []
+for file in os.listdir():
+    if file.endswith("_source.json"):
+        proceeding_input.append(file)
+
+print("proceeding_input: ", proceeding_input)
 
 # sqlite3
 db_file = "core.db"
@@ -68,6 +76,7 @@ def generate_pdf_filename(title):
 
 
 for input_file in proceeding_input:
+    print("processing: ", input_file)
     with open(input_file, "r") as f:
         data = json.load(f)
         caption = data["caption"]
@@ -85,16 +94,50 @@ for input_file in proceeding_input:
                 year = 2000 + suffix
             paper_entrys = proceeding_entry["paper_entrys"]
             for p in paper_entrys:
+
                 ptitle = p["title"]
                 pdoi = p["doi"]
-                print("retrieving metadata for paper: ", ptitle)
-                # ask crossref for the paper metadata
-                response = requests.get(
-                    f"https://api.crossref.org/works/{pdoi}")
+
+                if pdoi == '' or pdoi is None:
+                    print("no doi for paper: ", ptitle)
+                    # /works?query.title=room+at+the+bottom
+                    # ask crossref for the paper metadata using title words
+                    # to lower case
+                    title_words = ptitle.lower()
+                    title_words = ptitle.split(" ")
+                    for i in range(len(title_words)):
+                        title_words[i] = title_words[i].lower()
+                        title_words[i] = title_words[i].replace(":", "")
+                        title_words[i] = title_words[i].replace("?", "")
+                        title_words[i] = title_words[i].replace("!", "")
+                    # just use first 5 words
+                    title_words = title_words
+                    title_words = "+".join(title_words)
+                    # ask crossref for the paper metadata
+                    request_url = f"https://api.crossref.org/works?query.title={
+                        title_words}"
+                    print("[DEBUG] request_url: ", request_url)
+                    response = requests.get(request_url)
+                else:
+                    print("retrieving metadata for paper: ", ptitle)
+                    request_url = f"https://api.crossref.org/works/{pdoi}"
+                    # ask crossref for the paper metadata
+                    response = requests.get(request_url)
+
                 if response.status_code == 200:
                     data = response.json()
-                    data = data["message"]
-                    p_publisher = data["publisher"]
+                    message_type = data["message-type"]
+                    if message_type == "work-list":
+                        data = data["message"]["items"][0]
+                    else:
+                        data = data["message"]
+                    # print(f"[DEBUG] data: {data}")
+                    # something like 10.1145/3447928.3456709
+                    doi_crossref = data["DOI"]
+                    doi_url_crossref = "https://doi.org/" + doi_crossref
+                    if pdoi == '' or pdoi is None:
+                        pdoi = doi_url_crossref
+                        print(f"set pdoi to {pdoi}")
                     p_type = data["type"]
                     p_created = data["created"]
                     year = p_created["date-parts"][0][0]
@@ -110,8 +153,12 @@ for input_file in proceeding_input:
                         author_str += ", "
                     # remove the last comma
                     author_str = author_str[:-2]
-                    reference_raw = data["reference"]
-                    reference_raw_str = str(reference_raw)
+                    # check whether the paper has a reference
+                    if "reference" in data:
+                        reference_raw = data["reference"]
+                        reference_raw_str = str(reference_raw)
+                    else:
+                        reference_raw_str = ""                     
                     # download the pdf
                     # doi like https://doi.org/10.1145/3447928.3456709
                     # doi nums are like 10.1145/3447928.3456709
@@ -137,10 +184,10 @@ for input_file in proceeding_input:
                         # print(soup.text)
                         if "Unfortunately" in soup.text or "不在" in soup.text:
                             print(f"paper with doi {
-                                  doi_nums_raw} not found on scihub")
+                                doi_nums_raw} not found on scihub")
                         else:
                             print(f"paper with doi {
-                                  doi_nums_raw} found on scihub")
+                                doi_nums_raw} found on scihub")
                             # call cmd scihub -s {doi}
                             os.system(f"scihub -s {doi_nums_raw}")
                             # check the pdf/{check_pdf_name} again to see if downloaded
@@ -157,7 +204,7 @@ for input_file in proceeding_input:
                                 #     zip_blob = f.read()
                             else:
                                 print(f"error downloading pdf: {
-                                      check_pdf_name}")
+                                    check_pdf_name}")
 
                     insert_or_update(
                         con=con, table=db_table, caption=caption, year=year, ptitle=ptitle, pdoi=pdoi, authors=author_str, reference_raw=reference_raw_str, pdf=pdf_raw_blob)
