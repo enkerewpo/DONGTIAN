@@ -14,6 +14,7 @@ print("Database opened successfully, db file: ", full_path)
 
 OPENAI_URL = None
 OPENAI_KEY = None
+N = 2200
 
 with open("openai.json", "r") as f:
     data = json.load(f)
@@ -86,7 +87,22 @@ def update_full_text_db(con, table, paper):
 
 
 def update_abstract_db(con, table, paper):
-    pass
+    cur = con.cursor()
+    cur.execute(f"SELECT text FROM {table} WHERE id = ?", (paper[0],))
+    text = cur.fetchone()[0]
+    # get the abstract from the full text by sending it to the GPT model
+    history = []
+    history.append(
+        {"role": "user", "content": "response should be the abstract of the paper, return in plain text"})
+    response = get_llm_response(text[:N], history)
+    response = response.strip()
+    response = response.replace("*", "")
+    print(f"abstract: {response}")
+    # add the abstract into the database
+    cur.execute(
+        f"UPDATE {table} SET abstract = ? WHERE id = ?", (response, paper[0]))
+    con.commit()
+    cur.close()
 
 
 def update_category_db(con, table, paper):
@@ -116,7 +132,7 @@ def update_category_db(con, table, paper):
     history = []
     history.append(
         {"role": "user", "content": "response should be one category, available categories:" + ",".join(default_categories)})
-    response = get_llm_response(text[:600], history)
+    response = get_llm_response(text[:N], history)
     response = response.strip()
     response = response.replace("*", "")
     print(f"category: {response}")
@@ -125,6 +141,30 @@ def update_category_db(con, table, paper):
         f"UPDATE {table} SET gen_category = ? WHERE id = ?", (response, paper[0]))
     con.commit()
     cur.close()
+
+
+def update_ccs_db(con, table, paper):
+    cur = con.cursor()
+    # get the full text
+    cur.execute(f"SELECT text FROM {table} WHERE id = ?", (paper[0],))
+    text = cur.fetchone()[0]
+    # get the ccs from the full text by sending it to the GPT model
+    history = []
+    history.append(
+        {"role": "user", "content": "response should be contents after \"CCS Concepts:\" in the text if available, return in plain text"})
+    history.append(
+        {"role": "user", "content": "for example, CCS Concepts: • Software and its engineering → Operating systems; Checkpoint / restart; • Computer systems organization → Reliability; Secondary storage organization. should return things afte CCS Concepts:"})
+    history.append(
+        {"role": "user", "content": "if the text does not have CCS Concepts, then create several CCS Concepts with ACM format, return in plain text, just return the CCS don't add your dialog"})
+    response = get_llm_response(text[:N], history)
+    response = response.strip()
+    response = response.replace("*", "")
+    response = response.replace("CCS Concepts:", "")
+    response = response.replace("`", "")
+    print(f"ccs: {response}")
+    # add the ccs into the database
+    cur.execute(
+        f"UPDATE {table} SET gen_ccs = ? WHERE id = ?", (response, paper[0]))
 
 
 def update_keywords_db(con, table, paper):
@@ -140,9 +180,11 @@ def update_keywords_db(con, table, paper):
     # get the keywords from the full text by sending it to the GPT model
     history = []
     history.append(
-        {"role": "user", "content": "response should be no more than 5 keywords, separated by comma, just give me the keywords, all lowercase"})
-    # only send the first 600 characters of the text
-    response = get_llm_response(text[:600], history)
+        {"role": "user", "content": "response should be contents after \"Keywords:\" in the text if available, return in plain text, dont include \"Keywords:\""})
+    history.append(
+        {"role": "user", "content": "if the text does not have keywords, then summarize the text and return no more than 5 keywords, First letter of each keyword should be capitalized. just return the keywords don't add your dialog"})
+    # only send the first N characters of the text
+    response = get_llm_response(text[:N], history)
     response = response.strip()
     response = response.replace("*", "")
     print(f"keywords: {response}")
@@ -153,12 +195,23 @@ def update_keywords_db(con, table, paper):
     cur.close()
 
 
+def get_full_text_db(con, table, paper):
+    cur = con.cursor()
+    cur.execute(f"SELECT text FROM {table} WHERE id = ?", (paper[0],))
+    text = cur.fetchone()[0]
+    cur.close()
+    return text
+
+
 if __name__ == "__main__":
     papers = get_papers_with_pdf(con, db_table)
     for paper in papers:
         print(paper)
         update_full_text_db(con, db_table, paper)
+        text = get_full_text_db(con, db_table, paper)
+        # print(text[:N])
         update_abstract_db(con, db_table, paper)
         update_keywords_db(con, db_table, paper)
         update_category_db(con, db_table, paper)
+        update_ccs_db(con, db_table, paper)
     con.close()

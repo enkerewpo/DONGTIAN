@@ -36,25 +36,42 @@ function process(data) {
     let keywords_str = entry.keywords;
     let has_pdf = entry.has_pdf;
     let pdf_open_url = "/api/get_pdf/" + entry.id;
+    let abstract_open_url = "/api/get_abstract/" + entry.id;
     let category = entry.category;
+    let ccs_concepts = entry.ccs;
     if (!category_list.includes(category)) {
       category_list.push(category);
       map_category_to_color[category] = random_color(category);
     }
+    // https://doi.org/10.1145/3385412.3385980 to 10.1145/3385412.3385980
+    let doi_num = entry.doi.split("/").slice(-1)[0];
     r.push({
       // id: entry.id,
       title: entry.title,
       parent: entry.parent,
       year: entry.year,
       doi: entry.doi,
+      doi_num: doi_num,
       // authors: authors_str,
       keywords: keywords_str,
       has_pdf: has_pdf,
       category: category,
       category_color: map_category_to_color[category],
+      ccs: ccs_concepts,
       pdf_open_url: pdf_open_url,
+      abstract_open_url: abstract_open_url,
     });
   }
+
+  // sort by has_pdf, then by year
+  r.sort((a, b) => {
+    if (a.has_pdf && !b.has_pdf) return -1;
+    if (!a.has_pdf && b.has_pdf) return 1;
+    if (a.year < b.year) return 1;
+    if (a.year > b.year) return -1;
+    return 0;
+  });
+
   return r;
 }
 
@@ -95,7 +112,11 @@ export default {
     openPdf(pdf_open_url) {
       console.log(pdf_open_url);
       window.open(pdf_open_url, '_blank');
-    }
+    },
+    openAbstract(abstract_open_url) {
+      console.log(abstract_open_url);
+      window.open(abstract_open_url, '_blank');
+    },
   }
 };
 </script>
@@ -146,6 +167,7 @@ export default {
               <th>DOI</th>
               <th>Category</th>
               <th>Keywords</th>
+              <th>CCS</th>
               <th>PDF</th>
             </tr>
           </thead>
@@ -154,17 +176,21 @@ export default {
               <td>{{ p.title }}</td>
               <td>{{ p.parent }}</td>
               <td>{{ p.year }}</td>
-              <td> <a :href="p.doi" target="_blank" class="va-link">{{ p.doi }}</a> </td>
+              <td> <a :href="p.doi" target="_blank" class="va-link">{{ p.doi_num }}</a> </td>
               <td>
                 <VaBadge :text="p.category" :color="p.category_color" />
               </td>
               <td>{{ p.keywords }}</td>
+              <td>{{ p.ccs }}</td>
               <td>
                 <!-- if has pdf, show the button -->
                 <VaButton v-if="p.has_pdf" size="small" @click="openPdf(p.pdf_open_url)" color="primary">PDF
                 </VaButton>
                 <!-- if no pdf, show the disabled button -->
                 <VaButton v-else size="small" disabled>PDF</VaButton>
+              </td>
+              <td>
+                <VaButton size="small" @click="openAbstract(p.abstract_open_url)">Abstract</VaButton>
               </td>
             </tr>
           </tbody>
