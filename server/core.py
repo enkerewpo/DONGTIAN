@@ -56,7 +56,7 @@ def get_paper_entries(request):
             "parent": row[2],
             "year": row[3],
             "doi": row[4],
-            # "authors": row[5],
+            "authors": row[5],
             "keywords": row[6],
             "has_pdf": row[7] is not None,
             "category": c,
@@ -85,6 +85,35 @@ def post_pdf(request):
     con.close()
     return Response("pdf uploaded, id: " + id + ", size: " + str(len(pdf)) + " bytes")
 
+
+def get_paper(request):
+    # get the id of the paper
+    id = request.matchdict['id']
+    # open the database and get the entry
+    con = sqlite3.connect(db_file)
+    cur = con.cursor()
+    cur.execute(
+        f"SELECT id, title, parent, year, doi, authors, gen_keywords, pdf, gen_category, gen_ccs, abstract FROM {db_table} WHERE id = ?", (id,))
+    row = cur.fetchone()
+    con.close()
+    c = "none"
+    if row[8] is not None:
+        c = row[8]
+    json_data = {
+        "id": row[0],
+        "title": row[1],
+        "parent": row[2],
+        "year": row[3],
+        "doi": row[4],
+        "authors": row[5],
+        "keywords": row[6],
+        "has_pdf": row[7] is not None,
+        "category": c,
+        "ccs": row[9],
+        "abstract": row[10]
+    }
+    return Response(json=json_data)
+
 def post_rm_pdf(request):
     """ remove a pdf file """
     # get the id of the paper
@@ -98,17 +127,20 @@ def post_rm_pdf(request):
     con.close()
     return Response("pdf removed, id: " + id)
 
+
 def post_gen(request):
     """ trigger to generate keywords, category, css, etc using GPT for paper with id """
     id = request.matchdict['id']
     api_gen_by_id(id)
     return Response("gen triggered for id: " + id)
 
+
 def post_rm_gen(request):
     """ remove the generated keywords, category, css, etc for paper with id """
     id = request.matchdict['id']
     api_rm_gen_by_id(id)
     return Response("gen removed for id: " + id)
+
 
 if __name__ == '__main__':
     with Configurator() as config:
@@ -136,6 +168,9 @@ if __name__ == '__main__':
 
         config.add_route('post_rm_gen', '/post_rm_gen/{id}')
         config.add_view(post_rm_gen, route_name='post_rm_gen')
+
+        config.add_route('get_paper', '/get_paper/{id}')
+        config.add_view(get_paper, route_name='get_paper')
 
         app = config.make_wsgi_app()
 
