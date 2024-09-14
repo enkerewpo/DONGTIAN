@@ -80,8 +80,7 @@ def update_full_text_db(con, table, paper):
     assert text is not None
     text = text[0]
     if text is not None:
-        print(f"full text already exists for {
-              paper[0]}, preview: {text[:20]}")
+        print(f"full text already exists for {paper[0]}, preview: {text[:20]}")
         return True
     # first check whether we have the blob in the database
     cur.execute(f"SELECT pdf FROM {table} WHERE id = ?", (paper[0],))
