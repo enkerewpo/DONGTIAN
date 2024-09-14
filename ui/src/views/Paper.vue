@@ -86,6 +86,8 @@ export default {
                 let cross_ref = await getCrossRef(paper.value.doi);
                 let reference_raw = cross_ref.reference;
 
+                references.value = [];
+
                 // 在references中添加一个伪引用，用于指示是否正在加载
                 references.value.push({
                     id: 999,
