@@ -196,9 +196,20 @@ export default {
                 if (this.searchCCS === "") {
                     ret = filtered;
                 } else {
-                    ret = filtered.filter(p => p.ccs.toLowerCase().includes(this.searchCCS.toLowerCase()));
+                    console.log("filtered length:", filtered.length);
+                    // if css is empty for the paper, it will not be shown
+                    for (let i = 0; i < filtered.length; i++) {
+                        let p = filtered[i];
+                        if (p.ccs === null) {
+                            continue;
+                        }
+                        // console.log("p.ccs:", p.ccs);
+                        if (p.ccs.toLowerCase().includes(this.searchCCS.toLowerCase())) {
+                            ret.push(p);
+                        }
+                    }
                 }
-                // console.log("ret:", ret);
+                console.log("ret length:", ret.length);
             }
             // then check sorted_by
             let ret2 = ret;
@@ -254,7 +265,7 @@ export default {
             // remove the pdf file
             let url = "/post_rm_pdf/" + id;
             console.log("removing pdf file:", url);
-            axios.post(url).then(response => {
+            api.post(url).then(response => {
                 console.log(response);
                 ui_log("PDF已删除");
                 this.forceRefresh();
@@ -298,7 +309,7 @@ export default {
             reader.readAsArrayBuffer(this.tmp_pdf_file);
             let formData = new FormData();
             formData.append("pdf", this.tmp_pdf_file);
-            axios.post(url, formData, {
+            api.post(url, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -315,7 +326,7 @@ export default {
             // trigger the GEN process for the paper
             // api url: /api/post_gen/{id}
             const url = "/post_gen/" + id;
-            axios.post(url).then(response => {
+            api.post(url).then(response => {
                 console.log(response);
                 ui_log("GPT生成已完成");
                 this.forceRefresh();
@@ -328,7 +339,7 @@ export default {
             // remove the GEN file
             let url = "/post_rm_gen/" + id;
             console.log("removing GEN file:", url);
-            axios.post(url).then(response => {
+            api.post(url).then(response => {
                 console.log(response);
                 ui_log("GEN已删除");
                 this.forceRefresh();
@@ -380,8 +391,8 @@ export default {
         },
         forceRefresh: function () {
             console.log("forceRefresh");
-            axios.defaults.baseURL = '/api';
-            axios.get('get_paper_entries').then(response => {
+            api.defaults.baseURL = '/api';
+            api.get('get_paper_entries').then(response => {
                 let r = process(response.data);
                 this.paperEntries = r;
                 ui_log("已刷新");
@@ -489,13 +500,13 @@ export default {
                             <td>
                                 <VaButton size="small" @click="uploadPdf(p.id)" class="mr-1" color="secondary">+
                                 </VaButton>
-                                <VaButton size="small" @click="removePdf(p.id)" class="mt-1" color="secondary">-
+                                <VaButton size="small" @click="removePdf(p.id)" class="" color="secondary">-
                                 </VaButton>
                             </td>
                             <td>
                                 <VaButton size="small" @click="triggerGen(p.id)" class="mr-1" color="secondary">+
                                 </VaButton>
-                                <VaButton size="small" @click="removeGen(p.id)" class="mt-1" color="secondary">-
+                                <VaButton size="small" @click="removeGen(p.id)" class="" color="secondary">-
                                 </VaButton>
                             </td>
                         </tr>
