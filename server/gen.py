@@ -293,8 +293,7 @@ def api_rm_gen_by_id(id):
     print("clearing generated fields for paper id: ", id)
     con = sqlite3.connect(full_path)
     cur = con.cursor()
-    cur.execute(f"UPDATE {
-                db_table} SET abstract = NULL, gen_keywords = NULL, gen_category = NULL, gen_ccs = NULL WHERE id = ?", (id,))
+    cur.execute(f"UPDATE {db_table} SET abstract = NULL, gen_keywords = NULL, gen_category = NULL, gen_ccs = NULL WHERE id = ?", (id,))
     con.commit()
     con.close()
     return True
