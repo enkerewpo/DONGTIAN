@@ -96,6 +96,8 @@ export default {
                 });
 
                 // console.log(reference_raw);
+                // get route.params.id
+                let start_paper_id = route.params.id;
                 for (let i = 0; i < reference_raw.length; i++) {
                     let doi = reference_raw[i].DOI;
                     let generated = "";
@@ -103,6 +105,11 @@ export default {
                         // use getCrossRef to get basic info, add to unstructured:
                         // year, title, author, journal, volume, issue, page if exists
                         let ref_cross_ref = await getCrossRef(doi);
+                        if (route.params.id != start_paper_id) {
+                            // 如果在加载过程中切换了页面，停止加载
+                            console.log("stop retrieving references");
+                            break;
+                        }
                         if (ref_cross_ref == null) {
                             // ui_log('自动获取引用元信息失败：' + doi, 'error');
                             continue;
