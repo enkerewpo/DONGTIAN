@@ -10,9 +10,9 @@
 
   <VaNavbar color="#8B0012" id="navbar">
     <template #left>
-      <VaNavbarItem class="logo">
+      <VaNavbarItem class="logo noselect">
         &nbsp;&nbsp;&nbsp;
-        <span class="navbar-title">洞天论文知识图谱系统</span>
+        <span class="navbar-title" @click="$router.push('/')">洞天论文知识图谱系统</span>
         &nbsp;&nbsp;&nbsp;
         <span class="navbar-subtitle">powered by wheatfox(enkerewpo@hotmail.com)</span>
       </VaNavbarItem>
@@ -60,6 +60,21 @@ export default {
 </script>
 
 <style>
+.noselect {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Old versions of Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+}
+
 /* top menu item */
 /* hover is green, pressing is blue */
 .top-menu-item {
@@ -101,6 +116,7 @@ export default {
   margin-top: -9px;
   /* 默认字体大小 */
   font-weight: bold;
+  cursor: pointer;
 }
 
 .navbar-subtitle {

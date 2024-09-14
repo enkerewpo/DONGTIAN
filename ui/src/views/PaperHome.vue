@@ -1,6 +1,6 @@
 <script>
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
+import api from '@/util/api';
 import { useGlobalConfig } from 'vuestic-ui';
 import { useToast } from 'vuestic-ui'
 
@@ -143,8 +143,7 @@ export default {
         // Fetch the paper entries data when the component is mounted.
         onMounted(async () => {
             try {
-                axios.defaults.baseURL = '/api';
-                const response = await axios.get('get_paper_entries');
+                const response = await api.get('get_paper_entries');
                 let r = process(response.data);
                 paperEntries.value = r;
             } catch (error) {

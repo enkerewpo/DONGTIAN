@@ -26,7 +26,8 @@
 
 <script>
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
+// import axios from 'axios';
+import api from '@/util/api';
 import { useRoute } from 'vue-router';
 import { useToast } from 'vuestic-ui'
 
@@ -36,13 +37,17 @@ export default {
     name: 'PaperView',
     // call /get_paper/{id} to get paper data when entering or refreshing the page
     setup() {
+        console.log('(PaperView) setup');
         const route = useRoute();
         const toast = useToast();
 
         onMounted(async () => {
+            console.log('(PaperView) onMounted');
             try {
-                const response = await axios.get(`/get_paper/${route.params.id}`);
+                const response = await api.get('get_paper/' + route.params.id);
+                console.log(response);
                 paper.value = response.data;
+                console.log("ok");
             } catch (error) {
                 toast.open({
                     text: 'Failed to fetch paper data',
