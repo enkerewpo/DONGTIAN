@@ -80,7 +80,7 @@ def update_full_text_db(con, table, paper):
     assert text is not None
     text = text[0]
     if text is not None and text != "":
-        print(f"full text already exists for {paper[0]}, preview: {text[:20]}")
+        # print(f"full text already exists for {paper[0]}, preview: {text[:20]}")
         return True
     # first check whether we have the blob in the database
     cur.execute(f"SELECT pdf FROM {table} WHERE id = ?", (paper[0],))
@@ -121,8 +121,8 @@ def update_abstract_db(con, table, paper):
     assert abstract is not None
     abstract = abstract[0]
     if abstract is not None and abstract != "":
-        print(f"abstract already exists for {
-              paper[0]}, preview: {abstract[:20]}")
+        # print(f"abstract already exists for {
+        #       paper[0]}, preview: {abstract[:20]}")
         return
     cur.execute(f"SELECT text FROM {table} WHERE id = ?", (paper[0],))
     text = cur.fetchone()[0]
@@ -168,8 +168,8 @@ def update_category_db(con, table, paper):
     assert category is not None
     category = category[0]
     if category is not None and category != "" and category != "none":
-        print(f"category already exists for {
-            paper[0]}, preview: {category[:20]}")
+        # print(f"category already exists for {
+        #     paper[0]}, preview: {category[:20]}")
         return
     # get the full text
     cur = con.cursor()
@@ -200,8 +200,8 @@ def update_ccs_db(con, table, paper):
     assert ccs is not None
     ccs = ccs[0]
     if ccs is not None and ccs != "":
-        print(f"ccs already exists for {
-            paper[0]}, preview: {ccs[0][:10]}")
+        # print(f"ccs already exists for {
+        #     paper[0]}, preview: {ccs[0][:10]}")
         return
     cur = con.cursor()
     # get the full text
@@ -238,8 +238,8 @@ def update_keywords_db(con, table, paper):
     assert keywords is not None
     keywords = keywords[0]
     if keywords is not None and keywords != "":
-        print(f"keywords already exists for {
-            paper[0]}, preview: {keywords[:20]}")
+        # print(f"keywords already exists for {
+        #     paper[0]}, preview: {keywords[:20]}")
         return
     # get the full text
     cur.execute(f"SELECT text FROM {table} WHERE id = ?", (paper[0],))
