@@ -3,6 +3,7 @@ import HomeView from '@/views/HomeView.vue'
 import PaperHome from '@/views/PaperHome.vue'
 import AboutView from '@/views/AboutView.vue'
 import Paper from '../views/Paper.vue'
+import PaperEdit from '@/views/PaperEdit.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -30,6 +31,11 @@ const router = createRouter({
       path: '/paper/:id',
       name: 'paper',
       component: Paper
+    },
+    {
+      path: '/edit_paper/:id',
+      name: 'edit_paper',
+      component: PaperEdit
     }
   ]
 })

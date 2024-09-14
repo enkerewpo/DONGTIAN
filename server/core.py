@@ -110,9 +110,12 @@ def get_paper(request):
         "has_pdf": row[7] is not None,
         "category": c,
         "ccs": row[9],
-        "abstract": row[10]
+        "abstract": row[10],
+        # "reference_raw": row[11],
+        "citations": 0,
     }
     return Response(json=json_data)
+
 
 def post_rm_pdf(request):
     """ remove a pdf file """
@@ -140,6 +143,93 @@ def post_rm_gen(request):
     id = request.matchdict['id']
     api_rm_gen_by_id(id)
     return Response("gen removed for id: " + id)
+
+
+def post_add_one(request):
+    """ add a paper entry """
+    # insert a default empty entry
+    con = sqlite3.connect(db_file)
+    cur = con.cursor()
+    title = "PLEASE EDIT THIS TITLE AND UPDATE METADATA"
+    year = 2099
+    cur.execute(
+        f"INSERT INTO {db_table} (title, year) VALUES (?, ?)", (title, year))
+    con.commit()
+    con.close()
+
+
+def post_rm_paper(request):
+    """ remove a paper entry """
+    # get the id of the paper
+    id = request.matchdict['id']
+    # open the database and get the entry
+    con = sqlite3.connect(db_file)
+    cur = con.cursor()
+    cur.execute(
+        f"DELETE FROM {db_table} WHERE id = ?", (id,))
+    con.commit()
+    con.close()
+    return Response("paper removed, id: " + id)
+
+
+def post_update_paper(request):
+    """ update a paper entry """
+    # get the id of the paper
+    id = request.matchdict['id']
+    # translate the POST data's json to a dictionary
+    con = sqlite3.connect(db_file)
+    data = request.json_body
+
+    title = data["title"]
+    if title is None:
+        return Response("title is required")
+    cur = con.cursor()
+    cur.execute(
+        f"UPDATE {db_table} SET title = ? WHERE id = ?", (title, id))
+
+    parent = data["parent"]
+    if parent is not None:
+        cur.execute(
+            f"UPDATE {db_table} SET parent = ? WHERE id = ?", (parent, id))
+
+    year = data["year"]
+    if year is not None:
+        cur.execute(
+            f"UPDATE {db_table} SET year = ? WHERE id = ?", (year, id))
+
+    doi = data["doi"]
+    if doi is not None:
+        cur.execute(
+            f"UPDATE {db_table} SET doi = ? WHERE id = ?", (doi, id))
+
+    authors = data["authors"]
+    if authors is not None:
+        cur.execute(
+            f"UPDATE {db_table} SET authors = ? WHERE id = ?", (authors, id))
+
+    keywords = data["keywords"]
+    if keywords is not None:
+        cur.execute(
+            f"UPDATE {db_table} SET gen_keywords = ? WHERE id = ?", (keywords, id))
+
+    category = data["category"]
+    if category is not None:
+        cur.execute(
+            f"UPDATE {db_table} SET gen_category = ? WHERE id = ?", (category, id))
+
+    ccs = data["ccs"]
+    if ccs is not None:
+        cur.execute(
+            f"UPDATE {db_table} SET gen_ccs = ? WHERE id = ?", (ccs, id))
+
+    abstract = data["abstract"]
+    if abstract is not None:
+        cur.execute(
+            f"UPDATE {db_table} SET abstract = ? WHERE id = ?", (abstract, id))
+
+    con.commit()
+    con.close()
+    return Response("paper updated")
 
 
 if __name__ == '__main__':
@@ -171,6 +261,15 @@ if __name__ == '__main__':
 
         config.add_route('get_paper', '/get_paper/{id}')
         config.add_view(get_paper, route_name='get_paper')
+
+        config.add_route('add_one', '/add_one')
+        config.add_view(post_add_one, route_name='add_one')
+
+        config.add_route('rm_paper', '/rm_paper/{id}')
+        config.add_view(post_rm_paper, route_name='rm_paper')
+
+        config.add_route('update_paper', '/update_paper/{id}')
+        config.add_view(post_update_paper, route_name='update_paper')
 
         app = config.make_wsgi_app()
 

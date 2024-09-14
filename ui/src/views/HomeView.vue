@@ -1,9 +1,7 @@
 <template>
-    <div class="home-view">
-        <h1>Home View</h1>
-        <p>
-            <strong>Current route path:</strong> {{ $route.fullPath }}
-        </p>
+    <div class="paper-view va-block">
+        <div class="va-h4">欢迎来到洞天论文知识图谱系统！</div>
+        <div class="va-display-1">wheatfox (enkerewpo@hotmail.com)</div>
     </div>
 </template>
 

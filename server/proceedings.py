@@ -213,6 +213,7 @@ for input_file in proceeding_input:
                         given = author["given"]
                         family = author["family"]
                         affiliations = author["affiliation"]
+                        affiliation_name = "none"
                         for affiliation in affiliations:
                             affiliation_name = affiliation["name"]
                         author_str += f"[{given} {family}@{affiliation_name}]"

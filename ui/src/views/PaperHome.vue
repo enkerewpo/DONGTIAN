@@ -2,21 +2,13 @@
 import { ref, onMounted } from 'vue';
 import api from '@/util/api';
 import { useGlobalConfig } from 'vuestic-ui';
-import { useToast } from 'vuestic-ui'
+import { ui_log } from '@/util/log';
 
 // Define a reference for storing the paper entries data.
 const paperEntries = ref([]);
-const { init, notify, close, closeAll } = useToast()
 
 let category_list = [];
 let map_category_to_color = {};
-
-function ui_log(str) {
-    notify({
-        title: str,
-        position: 'bottom-left',
-    })
-}
 
 function random_color(str) {
     // hash the string to a number, so that the color is determined by the string
@@ -36,7 +28,7 @@ function random_color(str) {
 function authors2list(authors_str) {
     // [author1 name@affiliation1][author2 name@affiliation2]...
     // if undefined, return []
-    if (authors_str === undefined) {
+    if (authors_str == undefined || authors_str == null) {
         return [];
     }
     let authors = [];
@@ -60,7 +52,7 @@ function authors2list(authors_str) {
 function authors2affiliations(authors_str) {
     // [author1 name@affiliation1][author2 name@affiliation2]...
     // if undefined, return []
-    if (authors_str === undefined) {
+    if (authors_str === undefined || authors_str === null) {
         return [];
     }
     let affiliations = [];
@@ -107,6 +99,9 @@ function process(data) {
             map_category_to_color[category] = random_color(category);
         }
         // https://doi.org/10.1145/3385412.3385980 to 10.1145/3385412.3385980
+        if (entry.doi === undefined || entry.doi === null) {
+            entry.doi = "NO DOI";
+        }
         let doi_num = entry.doi.split("/").slice(-1)[0];
         r.push({
             id: entry.id,
@@ -176,12 +171,13 @@ export default {
             tmp_pdf_upload_id: null,
             tmp_pdf_file: null,
             current_frame: 0,
-            entries_per_frame: 8,
+            entries_per_frame: 9,
         };
     },
     computed: {
         getPapers: function () {
             console.log("getPapers:" + this.searchTitle + "," + this.searchCCS + "," + this.sorted_by + "," + this.sorted_order);
+            this.checkSearchConditionsAndResetFrame();
             let ret = [];
             let filtered = [];
             if (this.searchTitle === "" && this.searchCCS === "") {
@@ -246,6 +242,20 @@ export default {
         },
     },
     methods: {
+        checkSearchConditionsAndResetFrame: function () {
+            // if any search condition is not empty, reset the current frame to 0
+            let candidate = [this.searchTitle, this.searchCCS];
+            let reset = false;
+            for (let i = 0; i < candidate.length; i++) {
+                if (candidate[i] !== "") {
+                    reset = true;
+                    break;
+                }
+            }
+            if (reset) {
+                this.current_frame = 0;
+            }
+        },
         toggleSidebar: function () {
             this.minimized = !this.minimized;
         },
@@ -289,6 +299,14 @@ export default {
         jumpToFrame: function (frame) {
             // jump to the frame
             this.current_frame = frame - 1;
+        },
+        addOnePaperEntry: function () {
+            // api/add_one
+            // this will add a default paper entry with YEAR 2099
+            const response = api.post('add_one');
+            console.log(response);
+            this.forceRefresh();
+            ui_log("已添加一条记录");
         },
         getTitleById: function (id) {
             for (let i = 0; i < this.paperEntries.length; i++) {
@@ -412,24 +430,33 @@ export default {
         <div class="content">
             <div class="table-container">
                 <!-- add a filter input row for Each column -->
-                <div class="va-input-group mb-2">
-                    <VaInput placeholder="按标题查询" v-model="searchTitle" class="mr-2" />
-                    <VaInput placeholder="按CCS查询" v-model="searchCCS" class="mr-2" />
-                    <VaButton @click="forceRefresh()" preset="primary" class="" border-color="primary" icon="refresh">
+                <div class="va-input-group mb-2 mt-2">
+                    <VaButton @click="addOnePaperEntry()" preset="primary" class="mr-2" border-color="primary"
+                        icon="add">
+                    </VaButton>
+                    <VaButton @click="forceRefresh()" preset="primary" class="mr-2" border-color="primary"
+                        icon="refresh">
                     </VaButton>
                     <!-- frame navigation -->
-                    <VaButton @click="gotoPrevFrame()" preset="primary" class="ml-2" border-color="primary"
+                    <VaButton @click="gotoPrevFrame()" preset="primary" class="mr-2" border-color="primary"
                         icon="arrow_back">
                     </VaButton>
                     <!-- current frame index -->
-                    <span class="ml-3 mr-3">{{ current_frame + 1 }} / {{ getMaxFrame }}</span>
-                    <VaButton @click="gotoNextFrame()" preset="primary" class="ml-2" border-color="primary"
+                    <div class="mr-2" style="display: inline-block; padding: 0.3rem">
+                        <span>{{ current_frame + 1 }} / {{ getMaxFrame }}</span>
+                    </div>
+                    <VaButton @click="gotoNextFrame()" preset="primary" class="mr-2" border-color="primary"
                         icon="arrow_forward">
                     </VaButton>
-                    <div class="mt-3 mb-2">
+                    <VaInput placeholder="按标题查询" v-model="searchTitle" class="mr-2" />
+                    <VaInput placeholder="按分类查询" v-model="searchCategory" class="mr-2" />
+                    <VaInput placeholder="按CCS查询" v-model="searchCCS" class="mr-2" />
+                    <VaInput placeholder="按作者查询" v-model="searchAuthor" class="mr-2" />
+                    <VaInput placeholder="按机构查询" v-model="searchAffiliation" class="mr-2" />
+                    <div class="">
                         <template v-for="frame in getMaxFrame">
                             <!-- use tiny button for frame navigation -->
-                            <VaButton @click="jumpToFrame(frame)" size="small" class="ml-1" border-color="primary">
+                            <VaButton @click="jumpToFrame(frame)" size="small" class="mr-2 mt-2" border-color="primary">
                                 {{ frame }}
                             </VaButton>
                         </template>
@@ -463,12 +490,12 @@ export default {
                             <!-- each title will route to /paper/{id} -->
                             <td><router-link :to="'/paper/' + p.id" class="va-link">{{ p.title }}</router-link></td>
 
-                            <!-- <td>{{ p.parent }}</td> -->
-                            <td>
+                            <td class="smaller">{{ p.parent }}</td>
+                            <!-- <td>
                                 <VaBadge :text="p.parent" color="textPrimary" />
-                            </td>
+                            </td> -->
                             <td>{{ p.year }}</td>
-                            <td> <a :href="p.doi" target="_blank" class="va-link black-link">{{ p.doi_num }}</a> </td>
+                            <td> <a :href="p.doi" target="_blank" class="va-link black-link smaller">{{ p.doi_num }}</a> </td>
                             <td>
                                 <!-- generate badges in this column -->
                                 <template v-for="author in p.authors" :key="author">
@@ -478,7 +505,7 @@ export default {
                             <td>
                                 <!-- since affiliations are long, don't use badges and split with ; -->
                                 <template v-for="affiliation in p.affiliations" :key="affiliation">
-                                    <span class="smallest">{{ affiliation }};</span>
+                                    <span class="smallest">{{ affiliation }}.</span>
                                 </template>
                             </td>
                             <td>
@@ -553,6 +580,15 @@ export default {
 .app {
     display: flex;
     font-size: 14px;
+    width: 90%;
+    margin: 0 auto;
+}
+
+/* fullwidth under mobile */
+@media (max-width: 768px) {
+    .app {
+        width: 100%;
+    }
 }
 
 .table-container {
