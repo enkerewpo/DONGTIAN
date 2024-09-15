@@ -15,7 +15,7 @@ if ($args -contains "-c") {
 $openai = Get-Content openai.json | ConvertFrom-Json
 $url = $openai.url
 $key = $openai.key
-$scp_url = $openai.scp_url
+$scp_host = $openai.scp_host
 $scp_user = $openai.scp_user
 $scp_password = $openai.scp_password
 $scp_target_folder = $openai.scp_target_folder
@@ -120,7 +120,7 @@ else {
     # scp core.db root@www.oscommunity.cn:/www/wwwroot/dongtian.oscommunity.cn/core.db
 }
 
-$pscp_param = '-pw ' + $scp_password + ' core.db ' + $scp_user + '@' + $scp_url + ':' + $scp_target_folder + '/core.db'
+$pscp_param = '-pw ' + $scp_password + ' core.db ' + $scp_user + '@' + $scp_host + ':' + $scp_target_folder + '/core.db'
 $cmd = 'pscp ' + $pscp_param
 
 Write-Host "cmd: $cmd"
