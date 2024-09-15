@@ -1,4 +1,32 @@
 #!/bin/bash
 
 # run python server/core.py
-python3 server/core.py
+# python3 server/core.py
+
+# this shell script is a monitor that check whether this git repo need pull
+# check every 10 seconds
+
+# logic:
+# 1. this script will spawn a child process: python3 server/core.py and handle its output and control
+# 2. this script it self will check the git repo status every 10 seconds that if we need to pull 
+# 3. if we need to pull, we will kill the child process and pull the repo and restart the child process
+
+# start the child process
+python3 server/core.py &
+child_pid=$!
+
+echo "child process id: $child_pid"
+
+# check the git repo status every 10 seconds
+while true; do
+    # check if we need to pull
+    git fetch
+    if [ $(git rev-parse HEAD) != $(git rev-parse @{u}) ]; then
+        echo "need to pull! quitting $child_pid and restart"
+        kill $child_pid
+        git pull
+        python3 server/core.py &
+        child_pid=$!
+    fi
+    sleep 10
+done
