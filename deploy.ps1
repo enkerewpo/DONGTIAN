@@ -62,3 +62,4 @@ Write-Host "response: $choices"
 
 git add .
 git commit -m $choices
+git push
