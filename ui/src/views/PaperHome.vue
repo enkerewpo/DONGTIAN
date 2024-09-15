@@ -1,7 +1,7 @@
 <script>
 import { ref, onMounted } from 'vue';
 import api from '@/util/api';
-import { useGlobalConfig } from 'vuestic-ui';
+import { useGlobalConfig, VaSelect } from 'vuestic-ui';
 import { ui_log } from '@/util/log';
 
 // Define a reference for storing the paper entries data.
@@ -180,22 +180,21 @@ export default {
             ],
             search_title: getLocalStorage("search_title", ""),
             search_ccs: getLocalStorage("search_ccs", ""),
-            // filtered_paperEntries: [],
+            search_category: getLocalStorage("search_category", ""),
             sorted_by: "year", // support year and parent
             sorted_order: "desc", // "asc" or "desc" if possible
             tmp_pdf_upload_id: null,
             tmp_pdf_file: null,
-            current_frame: getLocalStorage("current_frame", 0),
+            current_frame: parseInt(getLocalStorage("current_frame", 0)),
             entries_per_frame: 9,
         };
     },
     computed: {
         getPapers: function () {
-            console.log("getPapers:" + this.search_title + "," + this.search_ccs + "," + this.sorted_by + "," + this.sorted_order);
             this.checkSearchConditionsAndResetFrame();
             let ret = [];
             let filtered = [];
-            if (this.search_title === "" && this.search_ccs === "") {
+            if (this.search_title === "" && this.search_ccs === "" && this.search_category === "") {
                 ret = this.papers;
             } else {
                 if (this.search_title === "") {
@@ -220,15 +219,30 @@ export default {
                         }
                     }
                 }
+                // filter by category if not empty
+                if (this.search_category !== "") {
+                    ret = ret.filter(p => p.category === this.search_category);
+                }
                 console.log("ret length:", ret.length);
             }
             // then check sorted_by
             let ret2 = ret;
+            // if year is the same, sort by title
             if (this.sorted_by === "year") {
                 if (this.sorted_order === "desc") {
-                    ret2.sort((a, b) => parseInt(b.year) - parseInt(a.year));
+                    ret2.sort((a, b) => {
+                        if (a.year === b.year) {
+                            return a.title.localeCompare(b.title);
+                        }
+                        return b.year - a.year;
+                    });
                 } else {
-                    ret2.sort((a, b) => parseInt(a.year) - parseInt(b.year));
+                    ret2.sort((a, b) => {
+                        if (a.year === b.year) {
+                            return a.title.localeCompare(b.title);
+                        }
+                        return a.year - b.year;
+                    });
                 }
             } else {
                 // default sort by has pdf
@@ -255,6 +269,17 @@ export default {
             }
             return max_frame;
         },
+        getCurrentCategoryList: function () {
+            let papers = this.getPapers;
+            let category_list = [];
+            for (let i = 0; i < papers.length; i++) {
+                let category = papers[i].category;
+                if (!category_list.includes(category)) {
+                    category_list.push(category);
+                }
+            }
+            return category_list;
+        },
     },
     methods: {
         getMaxFrameUtil: function () {
@@ -268,7 +293,7 @@ export default {
         },
         checkSearchConditionsAndResetFrame: function () {
             // if any search condition is not empty, reset the current frame to 0
-            let candidate = [this.search_title, this.search_ccs];
+            let candidate = [this.search_title, this.search_ccs, this.search_category];
             let reset = false;
             for (let i = 0; i < candidate.length; i++) {
                 if (candidate[i] !== "") {
@@ -464,6 +489,39 @@ export default {
             console.log("onChangeSearchTitle:", this.search_title);
             setLocalStorage("search_title", this.search_title);
         },
+        onChangeSearchCategory: function () {
+            console.log("onChangeSearchCategory:", this.search_category);
+            setLocalStorage("search_category", this.search_category);
+        },
+        clearSearchByCategory: function () {
+            console.log("clearSearchByCategory");
+            this.search_category = "";
+            setLocalStorage("search_category", "");
+        },
+        ayncUpdateAllMetadata: function () {
+            // trigger the update metadata process for all papers
+            const url = "/update_all_metadata";
+            api.post(url).then(response => {
+                console.log(response);
+                ui_log("元数据更新已触发，后台异步处理中");
+                this.forceRefresh();
+            }).catch(error => {
+                console.error("Error triggering update metadata process:", error);
+                ui_log("元数据更新失败");
+            });
+        },
+        ayncUpdateAllPDF: function () {
+            // trigger the update pdf process for all papers
+            const url = "/update_all_pdf";
+            api.post(url).then(response => {
+                console.log(response);
+                ui_log("PDF更新已触发，后台异步处理中");
+                this.forceRefresh();
+            }).catch(error => {
+                console.error("Error triggering update pdf process:", error);
+                ui_log("PDF更新失败");
+            });
+        },
     },
 };
 </script>
@@ -475,6 +533,14 @@ export default {
         <div class="content">
             <div class="table-container">
                 <!-- add a filter input row for Each column -->
+                <div class="va-input-group mb-1">
+                    <VaButton @click="ayncUpdateAllMetadata" class="mr-2" border-color="primary" size="small">
+                        自动获取全部元数据（CROSSREF）
+                    </VaButton>
+                    <VaButton @click="ayncUpdateAllPDF" class="mr-2" border-color="primary" size="small">
+                        自动获取全部PDF（SCIHUB）
+                    </VaButton>
+                </div>
                 <div class="va-input-group mb-2 mt-2">
                     <VaButton @click="addOnePaperEntry()" preset="primary" class="mr-2" border-color="primary"
                         icon="add">
@@ -496,12 +562,17 @@ export default {
                     <VaInput placeholder="按标题查询" v-model="search_title" class="mr-2" @change="onChangeSearchTitle" />
                     <!-- <VaInput placeholder="按分类查询" v-model="search_category" class="mr-2" /> -->
                     <VaInput placeholder="按CCS查询" v-model="search_ccs" class="mr-2" />
+                    <VaSelect placeholder="按分类查询" v-model="search_category" class="mr-2"
+                        :options="getCurrentCategoryList" @update:modelValue="onChangeSearchCategory" />
+                    <VaButton @click="clearSearchByCategory" class="mr-2 mt-2" border-color="primary" size="small">清除分类
+                        <VaIcon name="clear" />
+                    </VaButton>
                     <!-- <VaInput placeholder="按作者查询" v-model="search_author" class="mr-2" /> -->
                     <!-- <VaInput placeholder="按机构查询" v-model="search_affiliation" class="mr-2" /> -->
                     <div class="">
                         <template v-for="frame in getMaxFrame">
                             <!-- use tiny button for frame navigation -->
-                            <VaButton @click="jumpToFrame(frame)" size="small" class="mr-2 mt-2" border-color="primary">
+                            <VaButton @click="jumpToFrame(frame)" size="small" class="mr-2 mt-2" color="secondary">
                                 {{ frame }}
                             </VaButton>
                         </template>

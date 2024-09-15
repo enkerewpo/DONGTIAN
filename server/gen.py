@@ -2,6 +2,7 @@ import os
 import json
 import sqlite3
 import requests
+import sys
 import bs4
 from openai import OpenAI
 
@@ -49,6 +50,15 @@ def doi_url_to_num(doi_url):
     # https://doi.org/10.1145/3385412.3386011 to 3385412.3386011
     return doi_url.split("/")[-1]
 
+def format_doi(doi):
+    """ format a doi string """
+    # if start with prefix like https://aa.bb.cc.dd/10.1145/1234567.8901234
+    # then return 10.1145/1234567.8901234
+    if doi.startswith("https://") or doi.startswith("http://"):
+        last = doi.split("/")[-1]
+        middle = doi.split("/")[-2]
+        return middle + "/" + last
+    return doi
 
 def get_pdf_path(doi):
     num = doi_url_to_num(doi)
@@ -298,6 +308,126 @@ def api_rm_gen_by_id(id):
     con.close()
     return True
 
+def util_update_metadata_by_id(con, table, id):
+    cur = con.cursor()
+    cur.execute(f"SELECT doi FROM {table} WHERE id = ?", (id,))
+    doi = cur.fetchone()[0]
+    cur.close()
+    if doi is None or doi == "":
+        print(f"doi is None for {id}")
+        return False
+    doi = format_doi(doi)
+    url = f"https://api.crossref.org/works/{doi}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()["message"]
+        title = data["title"][0]
+        if title is None or title == "":
+            print(f"title is None for {id}")
+            return False
+        authors_raw = data["author"]
+        authors = ""
+        for author in authors_raw:
+            authors += "[" + author["given"] + " " + author["family"] + "@" + author["affiliation"][0]["name"] + "]"
+        year = data["created"]["date-parts"][0][0]
+        doi = "https://doi.org/" + data["DOI"]
+        parent = data["container-title"][0]
+        cur = con.cursor()
+        cur.execute(f"UPDATE {table} SET title = ?, authors = ?, year = ?, doi = ?, parent = ? WHERE id = ?", (title, authors, year, doi, parent, id))
+        con.commit()
+        cur.close()
+        print(f"updated metadata for {id}, title: {title}, year: {year}, doi: {doi}, parent: {parent}")
+        return True
+    else:
+        print(f"failed to fetch paper data from CrossRef for {id}")
+        return False
+
+def util_fetch_pdf_by_id(con, table, id):
+    cur = con.cursor()
+    cur.execute(f"SELECT doi FROM {table} WHERE id = ?", (id,))
+    doi = cur.fetchone()[0]
+    cur.close()
+    if doi is None or doi == "":
+        print(f"doi is None for {id}")
+        return False
+    doi = format_doi(doi)
+    cmd_dir = os.path.dirname(sys.executable) + "\\" + "Scripts\\"
+    program = "scihub"
+    args = f"-s {doi}"
+    cmd = cmd_dir + program + " " + args
+    print(f"triggered pdf fetch for id: {id}, doi: {doi}, cmd: {cmd}")
+    last = doi.split("/")[-1]
+    pdf_path = "pdf/" + last + ".pdf"
+    if os.path.exists(pdf_path):
+        print("pdf already fetched, replacing it in db")
+        with open(pdf_path, "rb") as f:
+            pdf = f.read()
+            cur = con.cursor()
+            cur.execute(
+                f"UPDATE {table} SET pdf = ? WHERE id = ?", (pdf, id))
+            con.commit()
+            print("pdf fetched and uploaded, id: " + id +
+                  ", size: " + str(len(pdf)) + " bytes")
+            return True
+    cmd_ret = os.system(cmd)
+    print(f"cmd return = {cmd_ret}")
+    if os.path.exists(pdf_path):
+        with open(pdf_path, "rb") as f:
+            if f is None:
+                print("pdf not found on scihub")
+                return False
+            pdf = f.read()
+            cur = con.cursor()
+            cur.execute(
+                f"UPDATE {table} SET pdf = ? WHERE id = ?", (pdf, id))
+            con.commit()
+            print("pdf fetched and uploaded, id: " + id +
+                  ", size: " + str(len(pdf)) + " bytes")
+            return True
+    else:
+        print("pdf not found on scihub")
+        return False
+
+def api_update_all_metadata():
+    # get authors, title, ... from crossref
+    print("updating all metadata...")
+    # iterate over all papers
+    con = sqlite3.connect(full_path)
+    cur = con.cursor()
+    cur.execute(f"SELECT id, doi FROM {db_table}")
+    papers = cur.fetchall()
+    cur.close()
+    for paper in papers:
+        id, doi = paper
+        if doi is None or doi == "":
+            print(f"doi is None for {id}")
+            continue
+        ok = util_update_metadata_by_id(con, db_table, id)
+        if not ok:
+            print(f"failed to update metadata for {id}")
+    print("metadata update done")
+    con.close()
+
+
+def api_update_all_pdf():
+    # get pdf from crossref
+    print("updating all pdf...")
+    # iterate over all papers
+    con = sqlite3.connect(full_path)
+    cur = con.cursor()
+    cur.execute(f"SELECT id, doi FROM {db_table}")
+    papers = cur.fetchall()
+    cur.close()
+    for paper in papers:
+        id, doi = paper
+        if doi is None or doi == "":
+            print(f"doi is None for {id}")
+            continue
+        ok = util_fetch_pdf_by_id(con, db_table, id)
+        if not ok:
+            print(f"failed to fetch pdf for {id}")
+    print("pdf update done")
+    con.close()
 
 if __name__ == "__main__":
     papers = get_papers_with_pdf(con, db_table)

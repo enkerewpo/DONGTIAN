@@ -174,79 +174,16 @@ def post_rm_paper(request):
     return Response("paper removed, id: " + id)
 
 
-def format_doi(doi):
-    """ format a doi string """
-    # if start with prefix like https://aa.bb.cc.dd/10.1145/1234567.8901234
-    # then return 10.1145/1234567.8901234
-    if doi.startswith("https://") or doi.startswith("http://"):
-        last = doi.split("/")[-1]
-        middle = doi.split("/")[-2]
-        return middle + "/" + last
-    return doi
-
-
 def post_fetch_pdf(request):
-    """ fetch a pdf file """
-    # get the id of the paper
+    # use util_fetch_pdf_by_id(con, table, id) to fetch pdf from scihub
     id = request.matchdict['id']
-    # open the database and get the doi info
     con = sqlite3.connect(db_file)
-    cur = con.cursor()
-    cur.execute(
-        f"SELECT doi FROM {db_table} WHERE id = ?", (id,))
-    doi = cur.fetchone()[0]
+    ok = util_fetch_pdf_by_id(con, db_table, id)
     con.close()
-    doi = format_doi(doi)
-    # cmd_dir = "D:\\anaconda3\\envs\\dongtian\\Scripts\\"
-    # auto get current python's Scripts dir
-    cmd_dir = os.path.dirname(sys.executable) + "\\" + "Scripts\\"
-    program = "scihub"
-    args = f"-s {doi}"
-    cmd = cmd_dir + program + " " + args
-    print(f"triggered pdf fetch for id: {id}, doi: {doi}, cmd: {cmd}")
-
-    # if we have pdf/last.pdf, last="1234567.8901234" if doi="10.1145/1234567.8901234"
-    last = doi.split("/")[-1]
-    # if we already have pdf/last.pdf, return
-    pdf_path = "pdf/" + last + ".pdf"
-    if os.path.exists(pdf_path):
-        print("pdf already fetched, replacing it in db")
-        with open(pdf_path, "rb") as f:
-            pdf = f.read()
-            con = sqlite3.connect(db_file)
-            cur = con.cursor()
-            cur.execute(
-                f"UPDATE {db_table} SET pdf = ? WHERE id = ?", (pdf, id))
-            con.commit()
-            con.close()
-            print("pdf fetched and uploaded, id: " + id +
-                  ", size: " + str(len(pdf)) + " bytes")
-            return Response("pdf fetched and uploaded, id: " + id + ", size: " + str(len(pdf)) + " bytes")
-
-    cmd_ret = os.system(cmd)
-
-    print(f"cmd return = {cmd_ret}")
-
-    if os.path.exists(pdf_path):
-        with open(pdf_path, "rb") as f:
-            if f is None:
-                print("pdf not found on scihub")
-                return Response("pdf not found on scihub")
-            pdf = f.read()
-            con = sqlite3.connect(db_file)
-            cur = con.cursor()
-            cur.execute(
-                f"UPDATE {db_table} SET pdf = ? WHERE id = ?", (pdf, id))
-            con.commit()
-            con.close()
-            print("pdf fetched and uploaded, id: " + id +
-                  ", size: " + str(len(pdf)) + " bytes")
-            return Response("pdf fetched and uploaded, id: " + id + ", size: " + str(len(pdf)) + " bytes")
+    if ok:
+        return Response("pdf fetched and uploaded, id: " + id)
     else:
-        # return error code if pdf not found
-        print("pdf not found on scihub")
-        return Response(body="pdf not found on scihub", status=500)
-
+        return Response("pdf not found on scihub", status=500)
 
 def post_update_paper(request):
     """ update a paper entry """
@@ -297,6 +234,17 @@ def post_update_paper(request):
     con.close()
     return Response("paper updated")
 
+import threading
+
+def post_update_all_metadata(request):
+    # use another thread to do this asynchronizely!!!
+    threading.Thread(target=api_update_all_metadata).start()
+    return Response("update all metadata triggered")
+
+def post_update_all_pdf(request):
+    # use another thread to do this asynchronizely!!!
+    threading.Thread(target=api_update_all_pdf).start()
+    return Response("update all pdf triggered")
 
 if __name__ == '__main__':
     with Configurator() as config:
@@ -327,6 +275,11 @@ if __name__ == '__main__':
         config.add_view(post_update_paper, route_name='update_paper')
         config.add_route('fetch_pdf', '/fetch_pdf/{id}')
         config.add_view(post_fetch_pdf, route_name='fetch_pdf')
+        config.add_route('update_all_metadata', '/update_all_metadata')
+        config.add_view(post_update_all_metadata, route_name='update_all_metadata')
+        config.add_route('update_all_pdf', '/update_all_pdf')
+        config.add_view(post_update_all_pdf, route_name='update_all_pdf')
+
         app = config.make_wsgi_app()
 
     server = make_server('0.0.0.0', 3332, app)
