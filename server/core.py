@@ -234,6 +234,21 @@ def post_update_paper(request):
     con.close()
     return Response("paper updated")
 
+def get_cateogry_and_count(request):
+    # return [{name: "category", count: 123}, ...]
+    con = sqlite3.connect(db_file)
+    cur = con.cursor()
+    cur.execute(
+        f"SELECT gen_category, COUNT(*) FROM {db_table} GROUP BY gen_category")
+    json_data = []
+    for row in cur.fetchall():
+        json_data.append({
+            "name": row[0],
+            "count": row[1]
+        })
+    con.close()
+    return Response(json=json_data)
+
 import threading
 
 def post_update_all_metadata(request):
@@ -279,6 +294,8 @@ if __name__ == '__main__':
         config.add_view(post_update_all_metadata, route_name='update_all_metadata')
         config.add_route('update_all_pdf', '/update_all_pdf')
         config.add_view(post_update_all_pdf, route_name='update_all_pdf')
+        config.add_route('category_and_count', '/category_and_count')
+        config.add_view(get_cateogry_and_count, route_name='category_and_count')
 
         app = config.make_wsgi_app()
 

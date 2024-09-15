@@ -67,6 +67,11 @@
   resolved "https://registry.npmjs.org/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.5.0.tgz"
   integrity sha512-gv3ZRaISU3fjPAgNsriBRqGWQL6quFx04YMPW/zD8XMLsU32mhCCbfbO6KZFLjvYpCZ8zyDEgqsgf+PwPaM7GQ==
 
+"@kurkle/color@^0.3.0":
+  version "0.3.2"
+  resolved "https://registry.npmjs.org/@kurkle/color/-/color-0.3.2.tgz"
+  integrity sha512-fuscdXJ9G1qb7W8VdHi+IwRqij3lBkosAm4ydQtEmbY58OzHXqQhvlxqEkoz0yssNVn38bcpRWgA9PP+OGoisw==
+
 "@rollup/rollup-win32-x64-msvc@4.21.3":
   version "4.21.3"
   resolved "https://registry.npmjs.org/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.21.3.tgz"
@@ -141,7 +146,7 @@
   dependencies:
     "@vue/shared" "3.5.5"
 
-"@vue/runtime-core@3.5.5":
+"@vue/runtime-core@^3.0.0", "@vue/runtime-core@3.5.5":
   version "3.5.5"
   resolved "https://registry.npmjs.org/@vue/runtime-core/-/runtime-core-3.5.5.tgz"
   integrity sha512-2/CFaRN17jgsXy4MpigWFBCAMmLkXPb4CjaHrndglwYSra7ajvkH2cat21dscuXaH91G8fXAeg5gCyxWJ+wCRA==
@@ -186,6 +191,13 @@ axios@^1.7.7:
     form-data "^4.0.0"
     proxy-from-env "^1.1.0"
 
+chart.js@^4.1.1, chart.js@^4.4.4:
+  version "4.4.4"
+  resolved "https://registry.npmjs.org/chart.js/-/chart.js-4.4.4.tgz"
+  integrity sha512-emICKGBABnxhMjUjlYRR12PmOXhJ2eJjEHL2/dZlWjxRAZT1D8xplLFq5M0tMQK8ja+wBS/tuVEJB5C6r7VxJA==
+  dependencies:
+    "@kurkle/color" "^0.3.0"
+
 cleave.js@^1.6.0:
   version "1.6.0"
   resolved "https://registry.npmjs.org/cleave.js/-/cleave.js-1.6.0.tgz"
@@ -207,6 +219,14 @@ delayed-stream@~1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/delayed-stream/-/delayed-stream-1.0.0.tgz"
   integrity sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==
+
+echarts@^5.5.1:
+  version "5.5.1"
+  resolved "https://registry.npmjs.org/echarts/-/echarts-5.5.1.tgz"
+  integrity sha512-Fce8upazaAXUVUVsjgV6mBnGuqgO+JNDlcgF79Dksy4+wgGpQB2lmYoO4TSweFg/mZITdpGHomw/cNBJZj1icA==
+  dependencies:
+    tslib "2.3.0"
+    zrender "5.6.0"
 
 entities@^4.5.0:
   version "4.5.0"
@@ -344,13 +364,20 @@ to-fast-properties@^2.0.0:
   resolved "https://registry.npmjs.org/to-fast-properties/-/to-fast-properties-2.0.0.tgz"
   integrity sha512-/OaKK0xYrs3DmxRYqL/yDc+FxFUVYhDlXMhRmv3z915w2HF1tnN1omB354j8VUGO/hbRzyD6Y3sA7v7GS/ceog==
 
+tslib@2.3.0:
+  version "2.3.0"
+  resolved "https://registry.npmjs.org/tslib/-/tslib-2.3.0.tgz"
+  integrity sha512-N82ooyxVNm6h1riLCoyS9e3fuJ3AMG2zIZs2Gd1ATcSFjSA23Q0fzjjZeh0jbJvWVDZ0cJT8yaNNaaXHzueNjg==
+
 "ui@file:":
   version "0.0.0"
   resolved "file:"
   dependencies:
     axios "^1.7.7"
+    chart.js "^4.4.4"
     ui "file:"
     vue "^3.4.29"
+    vue-chartjs "^5.3.1"
     vue-router "^4.3.3"
     vuestic-ui "^1.9.0"
 
@@ -365,10 +392,27 @@ vite@^5.0.0, vite@^5.4.5:
   optionalDependencies:
     fsevents "~2.3.3"
 
+vue-chartjs@^5.3.1:
+  version "5.3.1"
+  resolved "https://registry.npmjs.org/vue-chartjs/-/vue-chartjs-5.3.1.tgz"
+  integrity sha512-rZjqcHBxKiHrBl0CIvcOlVEBwRhpWAVf6rDU3vUfa7HuSRmGtCslc0Oc8m16oAVuk0erzc1FCtH1VCriHsrz+A==
+
+vue-demi@^0.13.11:
+  version "0.13.11"
+  resolved "https://registry.npmjs.org/vue-demi/-/vue-demi-0.13.11.tgz"
+  integrity sha512-IR8HoEEGM65YY3ZJYAjMlKygDQn25D5ajNFNoKh9RSDMQtlzCxtfQjdQgv9jjK+m3377SsJXY8ysq8kLCZL25A==
+
 vue-demi@>=0.13.0:
   version "0.14.10"
   resolved "https://registry.npmjs.org/vue-demi/-/vue-demi-0.14.10.tgz"
   integrity sha512-nMZBOwuzabUO0nLgIcc6rycZEebF6eeUfaiQx9+WSk8e29IbLvPU9feI6tqW4kTo3hvoYAJkMh8n8D0fuISphg==
+
+vue-echarts@^7.0.3:
+  version "7.0.3"
+  resolved "https://registry.npmjs.org/vue-echarts/-/vue-echarts-7.0.3.tgz"
+  integrity sha512-/jSxNwOsw5+dYAUcwSfkLwKPuzTQ0Cepz1LxCOpj2QcHrrmUa/Ql0eQqMmc1rTPQVrh2JQ29n2dhq75ZcHvRDw==
+  dependencies:
+    vue-demi "^0.13.11"
 
 vue-router@^4.3.3:
   version "4.4.5"
@@ -377,7 +421,7 @@ vue-router@^4.3.3:
   dependencies:
     "@vue/devtools-api" "^6.6.4"
 
-"vue@^3.0.0-0 || ^2.6.0", vue@^3.0.4, vue@^3.2.0, vue@^3.2.25, vue@^3.4.29, vue@3.5.5:
+"vue@^2.7.0 || ^3.1.1", "vue@^3.0.0-0 || ^2.6.0", "vue@^3.0.0-0 || ^2.7.0", vue@^3.0.4, vue@^3.2.0, vue@^3.2.25, vue@^3.4.29, vue@3.5.5:
   version "3.5.5"
   resolved "https://registry.npmjs.org/vue/-/vue-3.5.5.tgz"
   integrity sha512-ybC+xn67K4+df1yVeov4UjBGyVcXM0a1g7JVZr+pWVUX3xF6ntXU0wIjkTkduZBUIpxTlsftJSxz2kwhsT7dgA==
@@ -397,3 +441,10 @@ vuestic-ui@^1.9.0:
     "@types/lodash" "^4.14.161"
     cleave.js "^1.6.0"
     lodash "^4.17.21"
+
+zrender@5.6.0:
+  version "5.6.0"
+  resolved "https://registry.npmjs.org/zrender/-/zrender-5.6.0.tgz"
+  integrity sha512-uzgraf4njmmHAbEUxMJ8Oxg+P3fT04O+9p7gY+wJRVxo8Ge+KmYv0WJev945EH4wFuc4OY2NLXz46FZrWS9xJg==
+  dependencies:
+    tslib "2.3.0"

@@ -6,7 +6,7 @@
             <h1 class="va-h4">{{ paper.title }}</h1>
             <div class="va-text-block">
                 <h2 class="va-h6 mb-3">摘要</h2>
-                <p class="va-display-3">{{ paper.abstract }}</p>
+                <p class="">{{ paper.abstract }}</p>
             </div>
             <div class="va-text-block mt-4">
                 <h2 class="va-h6 mb-3">分类</h2>
@@ -18,7 +18,13 @@
             </div>
             <div class="va-text-block mt-4">
                 <h2 class="va-h6 mb-3">作者</h2>
-                <p>{{ paper.authors }}</p>
+                <template v-for="author in formatAuthors(paper.authors)">
+                    <VaBadge :text="author.name" class="mr-2 mb-2" color="primary" />
+                </template>
+                <h2 class="va-h6 mt-3">机构</h2>
+                <template v-for="affiliation in formatAffiliations(paper.authors)">
+                    <VaBadge :text="affiliation" class="mr-2 mb-2" color="secondary" />
+                </template>
             </div>
             <div class="va-text-block mt-4">
                 <h2 class="va-h6 mb-3">DOI</h2>
@@ -60,7 +66,7 @@ import { ref, onMounted } from 'vue';
 // import axios from 'axios';
 import api from '@/util/api';
 import { useRoute } from 'vue-router';
-import { useToast } from 'vuestic-ui'
+import { useToast, VaBadge } from 'vuestic-ui'
 import { getCrossRef } from '@/util/tool';
 import { ui_log } from '@/util/log';
 
@@ -168,6 +174,37 @@ export default {
         refreshPaper() {
             this.$router.go(0);
         },
+        formatAuthors(authors) {
+            let authors_list = authors.split(']');
+            // return a list of {name, affiliation}
+            let formatted = [];
+            for (let i = 0; i < authors_list.length; i++) {
+                let author = authors_list[i];
+                if (author == '') {
+                    continue;
+                }
+                let name = author.split('@')[0].substring(1);
+                let affiliation = author.split('@')[1];
+                formatted.push({
+                    name: name,
+                    affiliation: affiliation,
+                });
+            }
+            return formatted;
+        },
+        formatAffiliations(authors) {
+            let affiliation_set = new Set();
+            let authors_list = authors.split(']');
+            for (let i = 0; i < authors_list.length; i++) {
+                let author = authors_list[i];
+                if (author == '') {
+                    continue;
+                }
+                let affiliation = author.split('@')[1];
+                affiliation_set.add(affiliation);
+            }
+            return Array.from(affiliation_set);
+        },
     },
 }
 
@@ -176,5 +213,10 @@ export default {
 <style>
 .table-style {
     font-size: 13px;
+}
+
+p {
+    font-size: 15px;
+    line-height: 1.2;
 }
 </style>

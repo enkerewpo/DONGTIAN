@@ -375,7 +375,7 @@ def util_fetch_pdf_by_id(con, table, id):
             cur.execute(
                 f"UPDATE {table} SET pdf = ? WHERE id = ?", (pdf, id))
             con.commit()
-            print("pdf fetched and uploaded, id: " + id +
+            print("pdf fetched and uploaded, id: " + str(id) +
                   ", size: " + str(len(pdf)) + " bytes")
             return True
     cmd_ret = os.system(cmd)
@@ -390,7 +390,7 @@ def util_fetch_pdf_by_id(con, table, id):
             cur.execute(
                 f"UPDATE {table} SET pdf = ? WHERE id = ?", (pdf, id))
             con.commit()
-            print("pdf fetched and uploaded, id: " + id +
+            print("pdf fetched and uploaded, id: " + str(id) +
                   ", size: " + str(len(pdf)) + " bytes")
             return True
     else:
