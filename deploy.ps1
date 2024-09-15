@@ -18,6 +18,7 @@ $key = $openai.key
 $scp_url = $openai.scp_url
 $scp_user = $openai.scp_user
 $scp_password = $openai.scp_password
+$scp_target_folder = $openai.scp_target_folder
 
 if ($commit) {
     Write-Host "commit is true"
@@ -119,6 +120,9 @@ else {
     # scp core.db root@www.oscommunity.cn:/www/wwwroot/dongtian.oscommunity.cn/core.db
 }
 
-scp core.db '$scp_user@$scp_url:/www/wwwroot/dongtian.oscommunity.cn/core.db' -P 22 -pw $scp_password
+$scp_param = 'core.db ' + $scp_user + '@' + $scp_url + ':' + $scp_target_folder + '/core.db' + ' -P ' + $scp_password
+Write-Host "scp_param: $scp_param"
+
+scp $scp_param
 
 Write-Host "done!"
