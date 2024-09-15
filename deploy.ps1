@@ -2,7 +2,7 @@
 # should contain all line changes
 
 # first parse input args
-# ./deploy.ps1 [-c]
+# ./deploy.ps1 [-c] [-s] [-p]
 
 Function Write-Log {
     param(
@@ -60,44 +60,53 @@ Function Write-Log {
                 Message  = $Message
             } | Export-Csv -Path $LogFileName -Append -NoTypeInformation   
         }
-    }
+}
+
+$commit = $false
+$sync_db_from_remote = $false
+$push_db_to_remote = $false
+
+if ($args -contains "-c") {
+    $commit = $true
+}
+
+# if ($args -contains "-s") {
+#     $sync_db_from_remote = $true
+# }
+
+# if ($args -contains "-p") {
+#     $push_db_to_remote = $true
+# }
+
+# read openai.json
+$openai = Get-Content openai.json | ConvertFrom-Json
+$url = $openai.url
+$key = $openai.key
+$scp_host = $openai.scp_host
+$scp_user = $openai.scp_user
+$scp_password = $openai.scp_password
+$scp_target_folder = $openai.scp_target_folder
+
+Write-Log -Severity Info -Message "Welcome to deploy script(wheatfox<enkerewpo@hotmail.com>)"
     
-    # Write-Host "args: $args"
+if ($commit) {
+    Write-Log -Severity Info -Message "commit is true"
+    git add .
     
-    $commit = $false
+    $diff = git diff HEAD
     
-    if ($args -contains "-c") {
-        $commit = $true
-    }
-    # read openai.json
-    $openai = Get-Content openai.json | ConvertFrom-Json
-    $url = $openai.url
-    $key = $openai.key
-    $scp_host = $openai.scp_host
-    $scp_user = $openai.scp_user
-    $scp_password = $openai.scp_password
-    $scp_target_folder = $openai.scp_target_folder
+    # output to tmp_diff.txt
+    $diff | Out-File -FilePath tmp_diff.txt
     
-    Write-Log -Severity Info -Message "Welcome to deploy script(wheatfox<enkerewpo@hotmail.com>)"
+    Write-Log -Severity Warning -Message "url: $url key: $key"
     
-    if ($commit) {
-        Write-Log -Severity Info -Message "commit is true"
-        git add .
-        
-        $diff = git diff HEAD
-        
-        # output to tmp_diff.txt
-        $diff | Out-File -FilePath tmp_diff.txt
-        
-        Write-Log -Severity Warning -Message "url: $url key: $key"
-        
-        # ask openai to understand the diff and generate a summary as commit message
-        
-        # generate a list of history of the changes, each item is a dictionary with keys: role, content
-        # role: user or assistant, we are user
-        $history = New-Object System.Collections.ArrayList
-        
-        
+    # ask openai to understand the diff and generate a summary as commit message
+    
+    # generate a list of history of the changes, each item is a dictionary with keys: role, content
+    # role: user or assistant, we are user
+    $history = New-Object System.Collections.ArrayList
+    
+    
     # curl https://{url}/chat/completions \
     # -H "Content-Type: application/json" \
     # -H "Authorization: Bearer $OPENAI_API_KEY" \
@@ -144,40 +153,53 @@ Function Write-Log {
 
 }
 
-# Write-Host "copying core.db to target"
-Write-Log -Severity Info -Message "copying core.db to target"
+if ($push_db_to_remote) {
+ 
+    # Write-Host "copying core.db to target"
+    Write-Log -Severity Info -Message "copying core.db to target"
 
-# first generate a hash file of core.db so we don't need to copy it if it's the same
+    # first generate a hash file of core.db so we don't need to copy it if it's the same
 
-$hash = Get-FileHash core.db -Algorithm SHA256 | Select-Object -ExpandProperty Hash
+    $hash = Get-FileHash core.db -Algorithm SHA256 | Select-Object -ExpandProperty Hash
 
-# Write-Host "hash current core.db: $hash"
-Write-Log -Severity Info -Message "hash current core.db: $hash"
+    # Write-Host "hash current core.db: $hash"
+    Write-Log -Severity Info -Message "hash current core.db: $hash"
 
-# if hash file don't exist, create it with empty content
-if (-not (Test-Path core.db.hash)) {
-    New-Item -Path core.db.hash -ItemType file
+    # if hash file don't exist, create it with empty content
+    if (-not (Test-Path core.db.hash)) {
+        New-Item -Path core.db.hash -ItemType file
+    }
+
+    $old_hash = Get-Content core.db.hash
+    # Write-Host "old hash: $old_hash"
+    Write-Log -Severity Info -Message "old hash: $old_hash"
+
+    if ($hash -eq $old_hash) {
+        # Write-Host "core.db is the same, no need to copy"
+        Write-Log -Severity Info -Message "core.db is the same, no need to copy"
+    }
+    else {
+        # Write-Host "core.db is different, copying"
+        Write-Log -Severity Info -Message "core.db is different, copying"
+        $hash | Out-File -FilePath core.db.hash
+        $pscp_param = '-pw ' + '"' + $scp_password + '"' + ' core.db ' + $scp_user + '@' + $scp_host + ':' + $scp_target_folder + '/core.db'
+        $cmd = 'pscp ' + $pscp_param
+        Write-Host "cmd: $cmd"
+        Write-Log -Severity Info -Message "cmd: $cmd"
+        Invoke-Expression $cmd
+    }
+
 }
 
-$old_hash = Get-Content core.db.hash
-# Write-Host "old hash: $old_hash"
-Write-Log -Severity Info -Message "old hash: $old_hash"
-
-if ($hash -eq $old_hash) {
-    # Write-Host "core.db is the same, no need to copy"
-    Write-Log -Severity Info -Message "core.db is the same, no need to copy"
-}
-else {
-    # Write-Host "core.db is different, copying"
-    Write-Log -Severity Info -Message "core.db is different, copying"
-    $hash | Out-File -FilePath core.db.hash
-    $pscp_param = '-pw ' + '"' + $scp_password + '"' + ' core.db ' + $scp_user + '@' + $scp_host + ':' + $scp_target_folder + '/core.db'
+if ($sync_db_from_remote) {
+    # Write-Host "syncing core.db from remote"
+    Write-Log -Severity Info -Message "syncing core.db from remote"
+    $pscp_param = '-pw ' + '"' + $scp_password + '"' + ' ' + $scp_user + '@' + $scp_host + ':' + $scp_target_folder + '/core.db core.db'
     $cmd = 'pscp ' + $pscp_param
     Write-Host "cmd: $cmd"
     Write-Log -Severity Info -Message "cmd: $cmd"
     Invoke-Expression $cmd
 }
-
 
 # Write-Host "done!"
 Write-Log -Severity Success -Message "done!"
