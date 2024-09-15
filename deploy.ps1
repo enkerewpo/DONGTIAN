@@ -11,6 +11,13 @@ $commit = $false
 if ($args -contains "-c") {
     $commit = $true
 }
+# read openai.json
+$openai = Get-Content openai.json | ConvertFrom-Json
+$url = $openai.url
+$key = $openai.key
+$scp_url = $openai.scp_url
+$scp_user = $openai.scp_user
+$scp_password = $openai.scp_password
 
 if ($commit) {
     Write-Host "commit is true"
@@ -28,10 +35,6 @@ if ($commit) {
         # output to tmp_diff.txt
         $diff | Out-File -FilePath tmp_diff.txt
 
-        # read openai.json
-        $openai = Get-Content openai.json | ConvertFrom-Json
-        $url = $openai.url
-        $key = $openai.key
 
         Write-Host "url: $url key: $key"
 
@@ -112,9 +115,10 @@ else {
     Write-Host "core.db is different, copying"
     # update the hash file
     $hash | Out-File -FilePath core.db.hash
+    # target is https://www.oscommunity.cn scp ./core.db to target /www/wwwroot/dongtian.oscommunity.cn/core.db
+    # scp core.db root@www.oscommunity.cn:/www/wwwroot/dongtian.oscommunity.cn/core.db
 }
 
-# target is https://www.oscommunity.cn scp ./core.db to target /www/wwwroot/dongtian.oscommunity.cn/core.db
-scp core.db root@www.oscommunity.cn:/www/wwwroot/dongtian.oscommunity.cn/core.db
+scp core.db '$scp_user@$scp_url:/www/wwwroot/dongtian.oscommunity.cn/core.db' -P 22 -pw $scp_password
 
 Write-Host "done!"
