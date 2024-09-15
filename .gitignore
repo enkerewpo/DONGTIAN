@@ -164,3 +164,4 @@ cython_debug/
 core.db
 pdf
 openai.json
+# deploy.ps1

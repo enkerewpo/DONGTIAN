@@ -6,7 +6,7 @@
     <div class="paper-view va-block">
         <!-- <div class="va-h5">分类总览</div> -->
         <!-- pie chart-->
-        <v-chart class="chart" :option="option" />
+        <v-chart class="chart" :option="option" :autoresize="true" />
     </div>
 </template>
 
@@ -82,6 +82,10 @@ const option = ref({
     ]
 });
 
+const color_palette = [
+    '#FF0000', '#FFA500', '#FFFF00', '#008000', '#0000FF', '#4B0082', '#EE82EE', '#000000', '#808080', '#FFFFFF'
+];
+
 console.log('HomeView setup');
 // send a request to get the category and count info and update the option
 onMounted(async () => {
@@ -95,34 +99,33 @@ onMounted(async () => {
             // just skip
             return null;
         }
-        let tmp = { value: item.count, name: item.name };
+        let tmp = { value: item.count, name: item.name + '(' + item.count + ')' };
         return tmp;
     });
     data = data.filter(item => item !== null);
     option.value.series[0].data = data;
     // set chart name
     option.value.title.text = '各分类论文数量';
+
+    // add color palette to option series
+    option.value.series[0].data.forEach((item, index) => {
+        item.itemStyle = { color: color_palette[index % color_palette.length] };
+    });
+
+    // add listener for chart when windows resize
+    window.addEventListener('resize', () => {
+        console.log('resize');
+    });
 });
 
 </script>
 
 <style scoped>
 .chart {
-    height: 600px;
+    height: 400px;
 }
 
 .home-view {
     padding: 20px;
 }
 </style>
-
-<!-- setup() {
-        console.log('(HomeView) setup');
-        onMounted(async () => {
-            console.log('(HomeView) onMounted');
-            const response = await api.get('/category_and_count');
-            console.log(response.data);
-            categories_info.value = response.data;
-            // format: [{name: 'cat1', count: 100}, ...]
-        });
-    }, -->
