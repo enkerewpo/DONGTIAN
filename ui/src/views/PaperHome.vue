@@ -5,7 +5,7 @@ import { useGlobalConfig } from 'vuestic-ui';
 import { ui_log } from '@/util/log';
 
 // Define a reference for storing the paper entries data.
-const paperEntries = ref([]);
+const papers = ref([]);
 
 let category_list = [];
 let map_category_to_color = {};
@@ -125,9 +125,25 @@ function process(data) {
     return r;
 }
 
+function getLocalStorage(key, null_value = null) {
+    let value = localStorage.getItem(key);
+    if (value === null) {
+        console.log("getLocalStorage: key not found:", key, "returning:[", null_value, "](type:", typeof null_value, ")");
+        return null_value;
+    }
+    console.log("getLocalStorage:", key, value);
+    return value;
+}
+
+function setLocalStorage(key, value) {
+    localStorage.setItem(key, value);
+    console.log("setLocalStorage:",
+        key, value, localStorage.getItem(key));
+}
+
 export default {
     setup() {
-        const globalConfig = useGlobalConfig();
+        const global_config = useGlobalConfig();
         const minimized = ref(false);
 
         const checkScreenWidth = () => {
@@ -140,19 +156,18 @@ export default {
             try {
                 const response = await api.get('get_paper_entries');
                 let r = process(response.data);
-                paperEntries.value = r;
+                papers.value = r;
             } catch (error) {
                 console.error("Error fetching paper entries:", error);
             }
 
             checkScreenWidth();
             window.addEventListener('resize', checkScreenWidth);
-
         });
 
         return {
-            globalConfig,
-            paperEntries,
+            global_config,
+            papers,
             minimized,
         };
     },
@@ -163,33 +178,33 @@ export default {
                 { title: "论文列表", icon: "book", active: true, url: "/papers" },
                 { title: "关于", icon: "info", url: "/about" },
             ],
-            searchTitle: "",
-            searchCCS: "",
+            search_title: getLocalStorage("search_title", ""),
+            search_ccs: getLocalStorage("search_ccs", ""),
             // filtered_paperEntries: [],
             sorted_by: "year", // support year and parent
             sorted_order: "desc", // "asc" or "desc" if possible
             tmp_pdf_upload_id: null,
             tmp_pdf_file: null,
-            current_frame: 0,
+            current_frame: getLocalStorage("current_frame", 0),
             entries_per_frame: 9,
         };
     },
     computed: {
         getPapers: function () {
-            console.log("getPapers:" + this.searchTitle + "," + this.searchCCS + "," + this.sorted_by + "," + this.sorted_order);
+            console.log("getPapers:" + this.search_title + "," + this.search_ccs + "," + this.sorted_by + "," + this.sorted_order);
             this.checkSearchConditionsAndResetFrame();
             let ret = [];
             let filtered = [];
-            if (this.searchTitle === "" && this.searchCCS === "") {
-                ret = this.paperEntries;
+            if (this.search_title === "" && this.search_ccs === "") {
+                ret = this.papers;
             } else {
-                if (this.searchTitle === "") {
-                    filtered = this.paperEntries;
+                if (this.search_title === "") {
+                    filtered = this.papers;
                 } else {
-                    filtered = this.paperEntries.filter(p => p.title.toLowerCase().includes(this.searchTitle.toLowerCase()));
+                    filtered = this.papers.filter(p => p.title.toLowerCase().includes(this.search_title.toLowerCase()));
                 }
                 // console.log("filtered:", filtered);
-                if (this.searchCCS === "") {
+                if (this.search_ccs === "") {
                     ret = filtered;
                 } else {
                     console.log("filtered length:", filtered.length);
@@ -200,7 +215,7 @@ export default {
                             continue;
                         }
                         // console.log("p.ccs:", p.ccs);
-                        if (p.ccs.toLowerCase().includes(this.searchCCS.toLowerCase())) {
+                        if (p.ccs.toLowerCase().includes(this.search_ccs.toLowerCase())) {
                             ret.push(p);
                         }
                     }
@@ -242,9 +257,18 @@ export default {
         },
     },
     methods: {
+        getMaxFrameUtil: function () {
+            // return the max frame index
+            let total = this.getPapers.length;
+            let max_frame = Math.floor(total / this.entries_per_frame);
+            if (total % this.entries_per_frame !== 0) {
+                max_frame += 1;
+            }
+            return max_frame;
+        },
         checkSearchConditionsAndResetFrame: function () {
             // if any search condition is not empty, reset the current frame to 0
-            let candidate = [this.searchTitle, this.searchCCS];
+            let candidate = [this.search_title, this.search_ccs];
             let reset = false;
             for (let i = 0; i < candidate.length; i++) {
                 if (candidate[i] !== "") {
@@ -253,7 +277,13 @@ export default {
                 }
             }
             if (reset) {
-                this.current_frame = 0;
+                // if the value in local storage is within max frame, use that
+                let frame = getLocalStorage("current_frame", 0);
+                if (frame < this.getMaxFrameUtil) {
+                    this.setCurrentFrame(frame);
+                } else {
+                    this.setCurrentFrame(0);
+                }
             }
         },
         toggleSidebar: function () {
@@ -287,18 +317,29 @@ export default {
         gotoNextFrame: function () {
             // go to the next frame
             if (this.current_frame < this.getMaxFrame - 1) {
-                this.current_frame += 1;
+                this.setCurrentFrame(this.current_frame + 1);
             }
         },
         gotoPrevFrame: function () {
             // go to the previous frame
             if (this.current_frame > 0) {
-                this.current_frame -= 1;
+                this.setCurrentFrame(this.current_frame - 1);
             }
         },
         jumpToFrame: function (frame) {
             // jump to the frame
-            this.current_frame = frame - 1;
+            this.setCurrentFrame(frame - 1);
+        },
+        setCurrentFrame: function (frame) {
+            if (typeof frame !== "number") {
+                console.warn("setCurrentFrame: frame is not a number:", frame);
+                frame = parseInt(frame);
+                console.log("setCurrentFrame: frame is converted to:", frame);
+            }
+            console.log("setCurrentFrame:", frame);
+            this.current_frame = frame;
+            // store the current frame to local storage
+            localStorage.setItem("current_frame", frame);
         },
         addOnePaperEntry: function () {
             // api/add_one
@@ -309,9 +350,9 @@ export default {
             ui_log("已添加一条记录");
         },
         getTitleById: function (id) {
-            for (let i = 0; i < this.paperEntries.length; i++) {
-                if (this.paperEntries[i].id === id) {
-                    return this.paperEntries[i].title;
+            for (let i = 0; i < this.papers.length; i++) {
+                if (this.papers[i].id === id) {
+                    return this.papers[i].title;
                 }
             }
             return "Unknown";
@@ -412,12 +453,16 @@ export default {
             api.defaults.baseURL = '/api';
             api.get('get_paper_entries').then(response => {
                 let r = process(response.data);
-                this.paperEntries = r;
+                this.papers = r;
                 ui_log("已刷新");
             }).catch(error => {
                 console.error("Error fetching paper entries:", error);
                 ui_log("刷新失败");
             });
+        },
+        onChangeSearchTitle: function () {
+            console.log("onChangeSearchTitle:", this.search_title);
+            setLocalStorage("search_title", this.search_title);
         },
     },
 };
@@ -448,11 +493,11 @@ export default {
                     <VaButton @click="gotoNextFrame()" preset="primary" class="mr-2" border-color="primary"
                         icon="arrow_forward">
                     </VaButton>
-                    <VaInput placeholder="按标题查询" v-model="searchTitle" class="mr-2" />
-                    <VaInput placeholder="按分类查询" v-model="searchCategory" class="mr-2" />
-                    <VaInput placeholder="按CCS查询" v-model="searchCCS" class="mr-2" />
-                    <VaInput placeholder="按作者查询" v-model="searchAuthor" class="mr-2" />
-                    <VaInput placeholder="按机构查询" v-model="searchAffiliation" class="mr-2" />
+                    <VaInput placeholder="按标题查询" v-model="search_title" class="mr-2" @change="onChangeSearchTitle" />
+                    <!-- <VaInput placeholder="按分类查询" v-model="search_category" class="mr-2" /> -->
+                    <VaInput placeholder="按CCS查询" v-model="search_ccs" class="mr-2" />
+                    <!-- <VaInput placeholder="按作者查询" v-model="search_author" class="mr-2" /> -->
+                    <!-- <VaInput placeholder="按机构查询" v-model="search_affiliation" class="mr-2" /> -->
                     <div class="">
                         <template v-for="frame in getMaxFrame">
                             <!-- use tiny button for frame navigation -->
@@ -495,7 +540,8 @@ export default {
                                 <VaBadge :text="p.parent" color="textPrimary" />
                             </td> -->
                             <td>{{ p.year }}</td>
-                            <td> <a :href="p.doi" target="_blank" class="va-link black-link smaller">{{ p.doi_num }}</a> </td>
+                            <td> <a :href="p.doi" target="_blank" class="va-link black-link smaller">{{ p.doi_num }}</a>
+                            </td>
                             <td>
                                 <!-- generate badges in this column -->
                                 <template v-for="author in p.authors" :key="author">

@@ -50,7 +50,7 @@
             </table>
         </div>
         <div v-else>
-            <p>Loading...</p>
+            <p>加载中……</p>
         </div>
     </div>
 </template>
@@ -98,6 +98,7 @@ export default {
                 // console.log(reference_raw);
                 // get route.params.id
                 let start_paper_id = route.params.id;
+                let route_url = route.fullPath;
                 for (let i = 0; i < reference_raw.length; i++) {
                     let doi = reference_raw[i].DOI;
                     let generated = "";
@@ -105,7 +106,7 @@ export default {
                         // use getCrossRef to get basic info, add to unstructured:
                         // year, title, author, journal, volume, issue, page if exists
                         let ref_cross_ref = await getCrossRef(doi);
-                        if (route.params.id != start_paper_id) {
+                        if (route.fullPath != route_url) {
                             // 如果在加载过程中切换了页面，停止加载
                             console.log("stop retrieving references");
                             break;

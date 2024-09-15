@@ -5,7 +5,7 @@
             <VaButton @click="submitEdit" class="ml-1 mb-1" size="small">提交</VaButton>
             <VaButton @click="deleteEntry" class="ml-1 mb-1" size="small">删除</VaButton>
             <VaButton @click="updateFromCrossRef" class="ml-1 mb-1" size="small">由DOI在线更新基本信息</VaButton>
-            <!-- <VaButton @click="refreshPaper" class="ml-1 mb-1 mr-1" size="small">刷新</VaButton> -->
+            <VaButton @click="autoFetchPDFfromScihub" class="ml-1 mb-1" size="small">由DOI自动下载PDF(Sci-Hub)</VaButton>
             <h1 class="va-h4 mb-5">正在编辑：{{ paper.title }}</h1>
             <VaForm ref="formRef" class="flex flex-col items-baseline gap-6">
                 <VaTextarea v-model="paper.title" label="标题" placeholder="请输入标题" class="textarea" />
@@ -19,7 +19,7 @@
             </VaForm>
         </div>
         <div v-else>
-            <p>Loading...</p>
+            <p>加载中……</p>
         </div>
     </div>
 </template>
@@ -134,6 +134,27 @@ export default {
                     text: 'Failed to fetch paper data from CrossRef',
                     type: 'error',
                 });
+            }
+        },
+        async autoFetchPDFfromScihub() {
+            let doi = this.paper.doi; // in format of https://doi.org/10.5555/12345678
+            if (!doi || doi == '') {
+                ui_log('自动下载PDF失败，DOI为空');
+            }
+            if (doi.startsWith('https://doi.org/')) {
+                // remove 'https://doi.org/' prefix
+                doi = doi.split('https://doi.org/')[1];
+            }
+            ui_log('[DEBUG] doi: ' + doi);
+            // send a post request to /fetch_pdf/id to trigger a background task to fetch pdf
+            try {
+                ui_log('正在执行自动下载PDF流程，请不要关闭页面！');
+                const response = await api.post('fetch_pdf/' + this.paper.id, { doi: doi });
+                console.log(response);
+                ui_log('成功找到PDF并更新数据库');
+            } catch (error) {
+                console.log(error);
+                ui_log('自动下载PDF失败：' + error + '，MSG: ' + error.response.data);
             }
         },
     },

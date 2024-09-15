@@ -2,6 +2,8 @@ from wsgiref.simple_server import make_server
 from pyramid.config import Configurator
 from pyramid.response import Response
 import sqlite3
+import os
+import sys
 from gen import *
 
 db_file = "core.db"
@@ -172,6 +174,80 @@ def post_rm_paper(request):
     return Response("paper removed, id: " + id)
 
 
+def format_doi(doi):
+    """ format a doi string """
+    # if start with prefix like https://aa.bb.cc.dd/10.1145/1234567.8901234
+    # then return 10.1145/1234567.8901234
+    if doi.startswith("https://") or doi.startswith("http://"):
+        last = doi.split("/")[-1]
+        middle = doi.split("/")[-2]
+        return middle + "/" + last
+    return doi
+
+
+def post_fetch_pdf(request):
+    """ fetch a pdf file """
+    # get the id of the paper
+    id = request.matchdict['id']
+    # open the database and get the doi info
+    con = sqlite3.connect(db_file)
+    cur = con.cursor()
+    cur.execute(
+        f"SELECT doi FROM {db_table} WHERE id = ?", (id,))
+    doi = cur.fetchone()[0]
+    con.close()
+    doi = format_doi(doi)
+    # cmd_dir = "D:\\anaconda3\\envs\\dongtian\\Scripts\\"
+    # auto get current python's Scripts dir
+    cmd_dir = os.path.dirname(sys.executable) + "\\" + "Scripts\\"
+    program = "scihub"
+    args = f"-s {doi}"
+    cmd = cmd_dir + program + " " + args
+    print(f"triggered pdf fetch for id: {id}, doi: {doi}, cmd: {cmd}")
+
+    # if we have pdf/last.pdf, last="1234567.8901234" if doi="10.1145/1234567.8901234"
+    last = doi.split("/")[-1]
+    # if we already have pdf/last.pdf, return
+    pdf_path = "pdf/" + last + ".pdf"
+    if os.path.exists(pdf_path):
+        print("pdf already fetched, replacing it in db")
+        with open(pdf_path, "rb") as f:
+            pdf = f.read()
+            con = sqlite3.connect(db_file)
+            cur = con.cursor()
+            cur.execute(
+                f"UPDATE {db_table} SET pdf = ? WHERE id = ?", (pdf, id))
+            con.commit()
+            con.close()
+            print("pdf fetched and uploaded, id: " + id +
+                  ", size: " + str(len(pdf)) + " bytes")
+            return Response("pdf fetched and uploaded, id: " + id + ", size: " + str(len(pdf)) + " bytes")
+
+    cmd_ret = os.system(cmd)
+
+    print(f"cmd return = {cmd_ret}")
+
+    if os.path.exists(pdf_path):
+        with open(pdf_path, "rb") as f:
+            if f is None:
+                print("pdf not found on scihub")
+                return Response("pdf not found on scihub")
+            pdf = f.read()
+            con = sqlite3.connect(db_file)
+            cur = con.cursor()
+            cur.execute(
+                f"UPDATE {db_table} SET pdf = ? WHERE id = ?", (pdf, id))
+            con.commit()
+            con.close()
+            print("pdf fetched and uploaded, id: " + id +
+                  ", size: " + str(len(pdf)) + " bytes")
+            return Response("pdf fetched and uploaded, id: " + id + ", size: " + str(len(pdf)) + " bytes")
+    else:
+        # return error code if pdf not found
+        print("pdf not found on scihub")
+        return Response(body="pdf not found on scihub", status=500)
+
+
 def post_update_paper(request):
     """ update a paper entry """
     # get the id of the paper
@@ -179,54 +255,44 @@ def post_update_paper(request):
     # translate the POST data's json to a dictionary
     con = sqlite3.connect(db_file)
     data = request.json_body
-
     title = data["title"]
     if title is None:
         return Response("title is required")
     cur = con.cursor()
     cur.execute(
         f"UPDATE {db_table} SET title = ? WHERE id = ?", (title, id))
-
     parent = data["parent"]
     if parent is not None:
         cur.execute(
             f"UPDATE {db_table} SET parent = ? WHERE id = ?", (parent, id))
-
     year = data["year"]
     if year is not None:
         cur.execute(
             f"UPDATE {db_table} SET year = ? WHERE id = ?", (year, id))
-
     doi = data["doi"]
     if doi is not None:
         cur.execute(
             f"UPDATE {db_table} SET doi = ? WHERE id = ?", (doi, id))
-
     authors = data["authors"]
     if authors is not None:
         cur.execute(
             f"UPDATE {db_table} SET authors = ? WHERE id = ?", (authors, id))
-
     keywords = data["keywords"]
     if keywords is not None:
         cur.execute(
             f"UPDATE {db_table} SET gen_keywords = ? WHERE id = ?", (keywords, id))
-
     category = data["category"]
     if category is not None:
         cur.execute(
             f"UPDATE {db_table} SET gen_category = ? WHERE id = ?", (category, id))
-
     ccs = data["ccs"]
     if ccs is not None:
         cur.execute(
             f"UPDATE {db_table} SET gen_ccs = ? WHERE id = ?", (ccs, id))
-
     abstract = data["abstract"]
     if abstract is not None:
         cur.execute(
             f"UPDATE {db_table} SET abstract = ? WHERE id = ?", (abstract, id))
-
     con.commit()
     con.close()
     return Response("paper updated")
@@ -237,40 +303,30 @@ if __name__ == '__main__':
 
         config.add_route('hello', '/')
         config.add_view(hello_world, route_name='hello')
-
         config.add_route('get_paper_entries', '/get_paper_entries')
         config.add_view(get_paper_entries, route_name='get_paper_entries')
-
         config.add_route('get_pdf', '/get_pdf/{id}')
         config.add_view(get_pdf, route_name='get_pdf')
-
         config.add_route('get_abstract', '/get_abstract/{id}')
         config.add_view(get_abstract, route_name='get_abstract')
-
         config.add_route('post_pdf', '/post_pdf/{id}')
         config.add_view(post_pdf, route_name='post_pdf')
-
         config.add_route('post_gen', '/post_gen/{id}')
         config.add_view(post_gen, route_name='post_gen')
-
         config.add_route('post_rm_pdf', '/post_rm_pdf/{id}')
         config.add_view(post_rm_pdf, route_name='post_rm_pdf')
-
         config.add_route('post_rm_gen', '/post_rm_gen/{id}')
         config.add_view(post_rm_gen, route_name='post_rm_gen')
-
         config.add_route('get_paper', '/get_paper/{id}')
         config.add_view(get_paper, route_name='get_paper')
-
         config.add_route('add_one', '/add_one')
         config.add_view(post_add_one, route_name='add_one')
-
         config.add_route('rm_paper', '/rm_paper/{id}')
         config.add_view(post_rm_paper, route_name='rm_paper')
-
         config.add_route('update_paper', '/update_paper/{id}')
         config.add_view(post_update_paper, route_name='update_paper')
-
+        config.add_route('fetch_pdf', '/fetch_pdf/{id}')
+        config.add_view(post_fetch_pdf, route_name='fetch_pdf')
         app = config.make_wsgi_app()
 
     server = make_server('0.0.0.0', 3332, app)
