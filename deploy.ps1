@@ -11,92 +11,93 @@ Function Write-Log {
         [string]$Severity = 'Info',
         [switch]$LogToFile,
         [string]$LogFileName
-    )
-    If (!($LogFileName)) {
-        # LogFile parameter not specified (null), so determine one
-        $LogFolder = $PSScriptRoot
-        $LogName = Split-Path -Path $MyInvocation.ScriptName
-        $LogFileName = Join-Path -Path $LogFolder -ChildPath ('{0}-{1}.log' -f [string](Get-Date -format "yyyyMMdd"), $LogName)
-    }
-    $datetime = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
-    $SERVERY = $Severity.ToUpper()
-    $hostname = $env:COMPUTERNAME
-    $FormattedMessage = '[{0}] [{1}] [{2}] {3}' -f $datetime, $hostname, $SERVERY, $Message
-    Switch ($Severity) {
-        'Warning' {
-            Write-Host $FormattedMessage -ForegroundColor $host.PrivateData.WarningForegroundColor -BackgroundColor $host.PrivateData.WarningBackgroundColor
+        )
+        If (!($LogFileName)) {
+            # LogFile parameter not specified (null), so determine one
+            $LogFolder = $PSScriptRoot
+            $LogName = Split-Path -Path $MyInvocation.ScriptName
+            $LogFileName = Join-Path -Path $LogFolder -ChildPath ('{0}-{1}.log' -f [string](Get-Date -format "yyyyMMdd"), $LogName)
         }
-        'Error' {
-            Write-Host $FormattedMessage -ForegroundColor $host.PrivateData.ErrorForegroundColor -BackgroundColor $host.PrivateData.ErrorBackgroundColor        
-        }
-        'Verbose' {
-            Write-Host $FormattedMessage -ForegroundColor $host.PrivateData.VerboseForegroundColor -BackgroundColor $host.PrivateData.VerboseBackgroundColor
-        }
-        'Success' {
-            # green text
-            Write-Host $FormattedMessage -ForegroundColor Green
-        }
-        'Info' {
-            Write-Host $FormattedMessage
-        }
-        'Debug' {
-            # Only log debug messages if debug stream shown
-            If ($DebugPreference -ine 'SilentlyContinue') {
-                $FormattedMessage = '[DEBUG] {0}' -f $Message
-                Write-Host $FormattedMessage -ForegroundColor $host.PrivateData.DebugForegroundColor -BackgroundColor $host.PrivateData.DebugBackgroundColor
+        $datetime = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+        $SERVERY = $Severity.ToUpper()
+        $hostname = $env:COMPUTERNAME
+        $FormattedMessage = '[{0}] [{1}] [{2}] {3}' -f $datetime, $hostname, $SERVERY, $Message
+        Switch ($Severity) {
+            'Warning' {
+                Write-Host $FormattedMessage -ForegroundColor $host.PrivateData.WarningForegroundColor -BackgroundColor $host.PrivateData.WarningBackgroundColor
             }
-            # Never log debug messages to file
-            $LogToFile = $false
+            'Error' {
+                Write-Host $FormattedMessage -ForegroundColor $host.PrivateData.ErrorForegroundColor -BackgroundColor $host.PrivateData.ErrorBackgroundColor        
+            }
+            'Verbose' {
+                Write-Host $FormattedMessage -ForegroundColor $host.PrivateData.VerboseForegroundColor -BackgroundColor $host.PrivateData.VerboseBackgroundColor
+            }
+            'Success' {
+                # green text
+                Write-Host $FormattedMessage -ForegroundColor Green
+            }
+            'Info' {
+                Write-Host $FormattedMessage
+            }
+            'Debug' {
+                # Only log debug messages if debug stream shown
+                If ($DebugPreference -ine 'SilentlyContinue') {
+                    $FormattedMessage = '[DEBUG] {0}' -f $Message
+                    Write-Host $FormattedMessage -ForegroundColor $host.PrivateData.DebugForegroundColor -BackgroundColor $host.PrivateData.DebugBackgroundColor
+                }
+                # Never log debug messages to file
+                $LogToFile = $false
+            }
+            Default {
+                $FormattedMessage = '{0}' -f $Message
+                Write-Host $FormattedMessage
+            }
         }
-        Default {
-            $FormattedMessage = '{0}' -f $Message
-            Write-Host $FormattedMessage
+        If ($LogToFile) {
+            [pscustomobject]@{
+                Time     = [string](Get-Date -format 'yyyyMMddHHmmss')
+                Severity = $Severity
+                Message  = $Message
+            } | Export-Csv -Path $LogFileName -Append -NoTypeInformation   
         }
     }
-    If ($LogToFile) {
-        [pscustomobject]@{
-            Time     = [string](Get-Date -format 'yyyyMMddHHmmss')
-            Severity = $Severity
-            Message  = $Message
-        } | Export-Csv -Path $LogFileName -Append -NoTypeInformation   
+    
+    # Write-Host "args: $args"
+    
+    $commit = $false
+    
+    if ($args -contains "-c") {
+        $commit = $true
     }
-}
-
-# Write-Host "args: $args"
-
-$commit = $false
-
-if ($args -contains "-c") {
-    $commit = $true
-}
-# read openai.json
-$openai = Get-Content openai.json | ConvertFrom-Json
-$url = $openai.url
-$key = $openai.key
-$scp_host = $openai.scp_host
-$scp_user = $openai.scp_user
-$scp_password = $openai.scp_password
-$scp_target_folder = $openai.scp_target_folder
-
-Write-Log -Severity Info -Message "Welcome to deploy script(wheatfox<enkerewpo@hotmail.com>)"
-
-if ($commit) {
-    Write-Log -Severity Info -Message "commit is true"
-
-    $diff = git diff HEAD
-
-    # output to tmp_diff.txt
-    $diff | Out-File -FilePath tmp_diff.txt
-
-    Write-Log -Severity Warning -Message "url: $url key: $key"
-
-    # ask openai to understand the diff and generate a summary as commit message
-
-    # generate a list of history of the changes, each item is a dictionary with keys: role, content
-    # role: user or assistant, we are user
-    $history = New-Object System.Collections.ArrayList
-
-
+    # read openai.json
+    $openai = Get-Content openai.json | ConvertFrom-Json
+    $url = $openai.url
+    $key = $openai.key
+    $scp_host = $openai.scp_host
+    $scp_user = $openai.scp_user
+    $scp_password = $openai.scp_password
+    $scp_target_folder = $openai.scp_target_folder
+    
+    Write-Log -Severity Info -Message "Welcome to deploy script(wheatfox<enkerewpo@hotmail.com>)"
+    
+    if ($commit) {
+        Write-Log -Severity Info -Message "commit is true"
+        git add .
+        
+        $diff = git diff HEAD
+        
+        # output to tmp_diff.txt
+        $diff | Out-File -FilePath tmp_diff.txt
+        
+        Write-Log -Severity Warning -Message "url: $url key: $key"
+        
+        # ask openai to understand the diff and generate a summary as commit message
+        
+        # generate a list of history of the changes, each item is a dictionary with keys: role, content
+        # role: user or assistant, we are user
+        $history = New-Object System.Collections.ArrayList
+        
+        
     # curl https://{url}/chat/completions \
     # -H "Content-Type: application/json" \
     # -H "Authorization: Bearer $OPENAI_API_KEY" \
@@ -138,7 +139,6 @@ if ($commit) {
     # Write-Host "response: $choices"
     Write-Log -Severity Info -Message "commit message: $choices"
 
-    git add .
     git commit -m $choices
     git push
 
