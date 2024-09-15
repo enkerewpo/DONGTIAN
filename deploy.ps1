@@ -120,7 +120,7 @@ else {
     # scp core.db root@www.oscommunity.cn:/www/wwwroot/dongtian.oscommunity.cn/core.db
 }
 
-$pscp_param = '-pw ' + $scp_password + ' core.db ' + $scp_user + '@' + $scp_host + ':' + $scp_target_folder + '/core.db'
+$pscp_param = '-pw ' + '"' + $scp_password + '"' + ' core.db ' + $scp_user + '@' + $scp_host + ':' + $scp_target_folder + '/core.db'
 $cmd = 'pscp ' + $pscp_param
 
 Write-Host "cmd: $cmd"
