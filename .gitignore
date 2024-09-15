@@ -166,3 +166,4 @@ pdf
 openai.json
 # deploy.ps1
 tmp_diff.txt
+db_passwd

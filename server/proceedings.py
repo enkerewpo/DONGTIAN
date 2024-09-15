@@ -3,10 +3,7 @@ import json
 import sqlite3
 import requests
 import bs4
-
-# proceeding_input = [
-#     "sosp_source.json"
-# ]
+import pymysql
 
 # find all json files in the directory ending with _source.json
 proceeding_input = []
@@ -20,9 +17,30 @@ print("proceeding_input: ", proceeding_input)
 db_file = "core.db"
 db_table = "paper_entry"
 full_path = os.path.join(os.getcwd(), db_file)
-con = sqlite3.connect(full_path)
-print("Database opened successfully, db file: ", full_path)
+# con = sqlite3.connect(full_path)
+# print("Database opened successfully, db file: ", full_path)
 
+
+# mysql
+mysql_db_url = "www.oscommunity.cn"
+mysql_db_port = 3306
+mysql_db_name = "dongtian_db"
+mysql_db_user = "dongtian_db"
+mysql_db_table = "paper_entry"
+mysql_db_password = None
+
+if os.path.exists("db_passwd") is False:
+    print("db_passwd file not found")
+    exit(1)
+
+with open("db_passwd", "r") as f:
+    mysql_db_password = f.read()
+    mysql_db_password = mysql_db_password.strip()
+
+con = pymysql.connect(host=mysql_db_url, port=mysql_db_port, user=mysql_db_user,
+                      password=mysql_db_password, db=mysql_db_name, charset='utf8mb4')
+
+print("MYSQL Database opened successfully, db url: ", mysql_db_url)
 
 # crossref
 # https://api.crossref.org/work/{doi}
@@ -41,6 +59,7 @@ print("Database opened successfully, db file: ", full_path)
 
 def insert_or_update(con, table, caption, year, ptitle, pdoi, authors, reference_raw, pdf=None):
     # if ptitle has "'" then we need to remove it
+    reference_raw = "DEPRECATED"
     ptitle = ptitle.replace("'", "")
     cur = con.cursor()
     # if exists, update it
@@ -49,11 +68,17 @@ def insert_or_update(con, table, caption, year, ptitle, pdoi, authors, reference
         f"SELECT * FROM {table} WHERE title = '{ptitle}' AND doi = '{pdoi}'")
     data = cur.fetchall()
     if len(data) == 0:
+        # cur.execute(
+        #     f"INSERT INTO {table} (parent, year, title, doi, authors, reference_raw, pdf) VALUES (?, ?, ?, ?, ?, ?, ?)", (caption, year, ptitle, pdoi, authors, reference_raw, pdf))
+        # use mysql syntax
         cur.execute(
-            f"INSERT INTO {table} (parent, year, title, doi, authors, reference_raw, pdf) VALUES (?, ?, ?, ?, ?, ?, ?)", (caption, year, ptitle, pdoi, authors, reference_raw, pdf))
+            f"INSERT INTO {table} (parent, year, title, doi, authors, reference_raw, pdf) VALUES (%s, %s, %s, %s, %s, %s, %s)", (caption, year, ptitle, pdoi, authors, reference_raw, pdf))
     else:
+        # cur.execute(
+        #     f"UPDATE {table} SET parent = ?, year = ?, authors = ?, reference_raw = ?, pdf = ? WHERE title = ? AND doi = ?", (caption, year, authors, reference_raw, pdf, ptitle, pdoi))
+        # use mysql syntax
         cur.execute(
-            f"UPDATE {table} SET parent = ?, year = ?, authors = ?, reference_raw = ?, pdf = ? WHERE title = ? AND doi = ?", (caption, year, authors, reference_raw, pdf, ptitle, pdoi))
+            f"UPDATE {table} SET parent = %s, year = %s, authors = %s, reference_raw = %s, pdf = %s WHERE title = %s AND doi = %s", (caption, year, authors, reference_raw, pdf, ptitle, pdoi))
     con.commit()
     cur.close()
 
@@ -237,41 +262,41 @@ for input_file in proceeding_input:
 
                     pdf_raw_blob = None
 
-                    if os.path.exists(check_pdf_path):
-                        print(f"pdf already exists: {check_pdf_name}")
-                        with open(check_pdf_path, "rb") as f:
-                            pdf_raw_blob = f.read()
-                    else:
-                        # first quick check whether it's on scihub
-                        # url = https://www.wellesu.com/{doi}
-                        url = f"https://www.wellesu.com/{doi_nums_raw}"
-                        response = requests.get(url)
-                        soup = bs4.BeautifulSoup(response.text, "html.parser")
-                        # check if it's contains "Unfortunatly"
-                        # print(soup.text)
-                        if "Unfortunately" in soup.text or "不在" in soup.text:
-                            print(f"paper with doi {
-                                doi_nums_raw} not found on scihub")
-                        else:
-                            print(f"paper with doi {
-                                doi_nums_raw} found on scihub")
-                            # call cmd scihub -s {doi}
-                            os.system(f"scihub -s {doi_nums_raw}")
-                            # check the pdf/{check_pdf_name} again to see if downloaded
-                            if os.path.exists(check_pdf_path):
-                                print(f"pdf downloaded: {check_pdf_name}")
-                                with open(check_pdf_path, "rb") as f:
-                                    pdf_raw_blob = f.read()
-                                # # zip the blob
-                                # import zipfile
-                                # with zipfile.ZipFile(f"pdf/{check_pdf_name}.zip", "w") as zf:
-                                #     zf.write(check_pdf_path)
-                                # zip_blob = None
-                                # with open(f"pdf/{check_pdf_name}.zip", "rb") as f:
-                                #     zip_blob = f.read()
-                            else:
-                                print(f"error downloading pdf: {
-                                    check_pdf_name}")
+                    # if os.path.exists(check_pdf_path):
+                    #     print(f"pdf already exists: {check_pdf_name}")
+                    #     with open(check_pdf_path, "rb") as f:
+                    #         pdf_raw_blob = f.read()
+                    # else:
+                    #     # first quick check whether it's on scihub
+                    #     # url = https://www.wellesu.com/{doi}
+                    #     url = f"https://www.wellesu.com/{doi_nums_raw}"
+                    #     response = requests.get(url)
+                    #     soup = bs4.BeautifulSoup(response.text, "html.parser")
+                    #     # check if it's contains "Unfortunatly"
+                    #     # print(soup.text)
+                    #     if "Unfortunately" in soup.text or "不在" in soup.text:
+                    #         print(f"paper with doi {
+                    #             doi_nums_raw} not found on scihub")
+                    #     else:
+                    #         print(f"paper with doi {
+                    #             doi_nums_raw} found on scihub")
+                    #         # call cmd scihub -s {doi}
+                    #         os.system(f"scihub -s {doi_nums_raw}")
+                    #         # check the pdf/{check_pdf_name} again to see if downloaded
+                    #         if os.path.exists(check_pdf_path):
+                    #             print(f"pdf downloaded: {check_pdf_name}")
+                    #             with open(check_pdf_path, "rb") as f:
+                    #                 pdf_raw_blob = f.read()
+                    #             # # zip the blob
+                    #             # import zipfile
+                    #             # with zipfile.ZipFile(f"pdf/{check_pdf_name}.zip", "w") as zf:
+                    #             #     zf.write(check_pdf_path)
+                    #             # zip_blob = None
+                    #             # with open(f"pdf/{check_pdf_name}.zip", "rb") as f:
+                    #             #     zip_blob = f.read()
+                    #         else:
+                    #             print(f"error downloading pdf: {
+                    #                 check_pdf_name}")
 
                     insert_or_update(
                         con=con, table=db_table, caption=caption, year=year, ptitle=ptitle, pdoi=pdoi, authors=author_str, reference_raw=reference_raw_str, pdf=pdf_raw_blob)

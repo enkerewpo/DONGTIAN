@@ -4,6 +4,8 @@
 # first parse input args
 # ./deploy.ps1 [-c] [-s] [-p]
 
+pip freeze > requirements.txt
+
 Function Write-Log {
     param(
         [string]$Message = '',
@@ -98,6 +100,11 @@ if ($commit) {
     # output to tmp_diff.txt
     $diff | Out-File -FilePath tmp_diff.txt
     
+    # trim diff to 1000 characters
+    $end = [Math]::Min(500, $diff.Length)
+    Write-Log -Severity Info -Message "end: $end"
+    $diff = $diff[0..$end] -join ''
+
     Write-Log -Severity Warning -Message "url: $url key: $key"
     
     # ask openai to understand the diff and generate a summary as commit message

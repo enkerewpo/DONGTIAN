@@ -4,14 +4,40 @@ import sqlite3
 import requests
 import sys
 import bs4
+import pymysql
 from openai import OpenAI
 
 # sqlite3
 db_file = "core.db"
 db_table = "paper_entry"
 full_path = os.path.join(os.getcwd(), db_file)
-con = sqlite3.connect(full_path)
-print("Database opened successfully, db file: ", full_path)
+# con = connect()
+# print("Database opened successfully, db file: ", full_path)
+
+# mysql
+mysql_db_url = "www.oscommunity.cn"
+mysql_db_port = 3306
+mysql_db_name = "dongtian_db"
+mysql_db_user = "dongtian_db"
+mysql_db_table = "paper_entry"
+mysql_db_password = None
+
+if os.path.exists("db_passwd") is False:
+    print("db_passwd file not found")
+    exit(1)
+
+with open("db_passwd", "r") as f:
+    mysql_db_password = f.read()
+    mysql_db_password = mysql_db_password.strip()
+
+con = pymysql.connect(host=mysql_db_url, port=mysql_db_port, user=mysql_db_user,
+                      password=mysql_db_password, db=mysql_db_name, charset='utf8mb4')
+
+def connect():
+    con = pymysql.connect(host=mysql_db_url, port=mysql_db_port, user=mysql_db_user,
+                          password=mysql_db_password, db=mysql_db_name, charset='utf8mb4')
+    return con
+
 
 OPENAI_URL = None
 OPENAI_KEY = None
@@ -67,6 +93,8 @@ def get_pdf_path(doi):
 
 def get_papers_with_pdf(con, table):
     cur = con.cursor()
+    # cur.execute(f"SELECT id, doi FROM {table} WHERE pdf IS NOT NULL")
+    # use mysql syntax
     cur.execute(f"SELECT id, doi FROM {table} WHERE pdf IS NOT NULL")
     data = cur.fetchall()
     cur.close()
@@ -85,7 +113,8 @@ def get_os_tmp_folder():
 def update_full_text_db(con, table, paper):
     # # if the db already has the full text, then skip
     cur = con.cursor()
-    cur.execute(f"SELECT text FROM {table} WHERE id = ?", (paper[0],))
+    # cur.execute(f"SELECT text FROM {table} WHERE id = ?", (paper[0],))
+    cur.execute(f"SELECT text FROM {table} WHERE id = %s", (paper[0],))
     text = cur.fetchone()
     assert text is not None
     text = text[0]
@@ -93,7 +122,8 @@ def update_full_text_db(con, table, paper):
         # print(f"full text already exists for {paper[0]}, preview: {text[:20]}")
         return True
     # first check whether we have the blob in the database
-    cur.execute(f"SELECT pdf FROM {table} WHERE id = ?", (paper[0],))
+    # cur.execute(f"SELECT pdf FROM {table} WHERE id = ?", (paper[0],))
+    cur.execute(f"SELECT pdf FROM {table} WHERE id = %s", (paper[0],))
     pdf = cur.fetchone()
     assert pdf is not None
     pdf = pdf[0]
@@ -116,8 +146,8 @@ def update_full_text_db(con, table, paper):
     # add the parsed text into the database column text
     print(f"parsed text: {parsed_text[:100]}")
     cur = con.cursor()
-    cur.execute(f"UPDATE {table} SET text = ? WHERE id = ?",
-                (parsed_text, paper[0]))
+    # cur.execute(f"UPDATE {table} SET text = ? WHERE id = ?", (parsed_text, paper[0]))
+    cur.execute(f"UPDATE {table} SET text = %s WHERE id = %s", (parsed_text, paper[0]))
     con.commit()
     cur.close()
     return True
@@ -126,7 +156,8 @@ def update_full_text_db(con, table, paper):
 def update_abstract_db(con, table, paper):
     cur = con.cursor()
     # if the db already has the abstract, then skip
-    cur.execute(f"SELECT abstract FROM {table} WHERE id = ?", (paper[0],))
+    # cur.execute(f"SELECT abstract FROM {table} WHERE id = ?", (paper[0],))
+    cur.execute(f"SELECT abstract FROM {table} WHERE id = %s", (paper[0],))
     abstract = cur.fetchone()
     assert abstract is not None
     abstract = abstract[0]
@@ -134,7 +165,8 @@ def update_abstract_db(con, table, paper):
         # print(f"abstract already exists for {
         #       paper[0]}, preview: {abstract[:20]}")
         return
-    cur.execute(f"SELECT text FROM {table} WHERE id = ?", (paper[0],))
+    # cur.execute(f"SELECT text FROM {table} WHERE id = ?", (paper[0],))
+    cur.execute(f"SELECT text FROM {table} WHERE id = %s", (paper[0],))
     text = cur.fetchone()[0]
     # get the abstract from the full text by sending it to the GPT model
     history = []
@@ -147,8 +179,8 @@ def update_abstract_db(con, table, paper):
     response = response.replace("\r", "")
     print(f"abstract: {response}")
     # add the abstract into the database
-    cur.execute(
-        f"UPDATE {table} SET abstract = ? WHERE id = ?", (response, paper[0]))
+    # cur.execute(f"UPDATE {table} SET abstract = ? WHERE id = ?", (response, paper[0]))
+    cur.execute(f"UPDATE {table} SET abstract = %s WHERE id = %s", (response, paper[0]))
     con.commit()
     cur.close()
 
@@ -173,7 +205,8 @@ def update_category_db(con, table, paper):
     ]
     # if the db already has the category, then skip
     cur = con.cursor()
-    cur.execute(f"SELECT gen_category FROM {table} WHERE id = ?", (paper[0],))
+    # cur.execute(f"SELECT gen_category FROM {table} WHERE id = ?", (paper[0],))
+    cur.execute(f"SELECT gen_category FROM {table} WHERE id = %s", (paper[0],))
     category = cur.fetchone()
     assert category is not None
     category = category[0]
@@ -183,7 +216,8 @@ def update_category_db(con, table, paper):
         return
     # get the full text
     cur = con.cursor()
-    cur.execute(f"SELECT text FROM {table} WHERE id = ?", (paper[0],))
+    # cur.execute(f"SELECT text FROM {table} WHERE id = ?", (paper[0],))
+    cur.execute(f"SELECT text FROM {table} WHERE id = %s", (paper[0],))
     text = cur.fetchone()[0]
     # get the one category from the full text by sending it to the GPT model
     history = []
@@ -196,8 +230,8 @@ def update_category_db(con, table, paper):
     response = response.replace("\r", "")
     print(f"category: {response}")
     # add the category into the database
-    cur.execute(
-        f"UPDATE {table} SET gen_category = ? WHERE id = ?", (response, paper[0]))
+    # cur.execute(f"UPDATE {table} SET gen_category = ? WHERE id = ?", (response, paper[0]))
+    cur.execute(f"UPDATE {table} SET gen_category = %s WHERE id = %s", (response, paper[0]))
     con.commit()
     cur.close()
 
@@ -205,7 +239,8 @@ def update_category_db(con, table, paper):
 def update_ccs_db(con, table, paper):
     # if the db already has the ccs, then skip
     cur = con.cursor()
-    cur.execute(f"SELECT gen_ccs FROM {table} WHERE id = ?", (paper[0],))
+    # cur.execute(f"SELECT gen_ccs FROM {table} WHERE id = ?", (paper[0],))
+    cur.execute(f"SELECT gen_ccs FROM {table} WHERE id = %s", (paper[0],))
     ccs = cur.fetchone()
     assert ccs is not None
     ccs = ccs[0]
@@ -215,7 +250,8 @@ def update_ccs_db(con, table, paper):
         return
     cur = con.cursor()
     # get the full text
-    cur.execute(f"SELECT text FROM {table} WHERE id = ?", (paper[0],))
+    # cur.execute(f"SELECT text FROM {table} WHERE id = ?", (paper[0],))
+    cur.execute(f"SELECT text FROM {table} WHERE id = %s", (paper[0],))
     text = cur.fetchone()[0]
     # get the ccs from the full text by sending it to the GPT model
     history = []
@@ -234,8 +270,8 @@ def update_ccs_db(con, table, paper):
     response = response.replace("\r", "")
     print(f"ccs: {response}")
     # add the ccs into the database
-    cur.execute(
-        f"UPDATE {table} SET gen_ccs = ? WHERE id = ?", (response, paper[0]))
+    # cur.execute(f"UPDATE {table} SET gen_ccs = ? WHERE id = ?", (response, paper[0]))
+    cur.execute(f"UPDATE {table} SET gen_ccs = %s WHERE id = %s", (response, paper[0]))
     con.commit()
     cur.close()
 
@@ -243,7 +279,8 @@ def update_ccs_db(con, table, paper):
 def update_keywords_db(con, table, paper):
     # if the db already has the keywords, then skip
     cur = con.cursor()
-    cur.execute(f"SELECT gen_keywords FROM {table} WHERE id = ?", (paper[0],))
+    # cur.execute(f"SELECT gen_keywords FROM {table} WHERE id = ?", (paper[0],))
+    cur.execute(f"SELECT gen_keywords FROM {table} WHERE id = %s", (paper[0],))
     keywords = cur.fetchone()
     assert keywords is not None
     keywords = keywords[0]
@@ -252,7 +289,8 @@ def update_keywords_db(con, table, paper):
         #     paper[0]}, preview: {keywords[:20]}")
         return
     # get the full text
-    cur.execute(f"SELECT text FROM {table} WHERE id = ?", (paper[0],))
+    # cur.execute(f"SELECT text FROM {table} WHERE id = ?", (paper[0],))
+    cur.execute(f"SELECT text FROM {table} WHERE id = %s", (paper[0],))
     text = cur.fetchone()[0]
     # get the keywords from the full text by sending it to the GPT model
     history = []
@@ -268,15 +306,16 @@ def update_keywords_db(con, table, paper):
     response = response.replace("\r", "")
     print(f"keywords: {response}")
     # add the keywords into the database
-    cur.execute(
-        f"UPDATE {table} SET gen_keywords = ? WHERE id = ?", (response, paper[0]))
+    # cur.execute(f"UPDATE {table} SET gen_keywords = ? WHERE id = ?", (response, paper[0]))
+    cur.execute(f"UPDATE {table} SET gen_keywords = %s WHERE id = %s", (response, paper[0]))
     con.commit()
     cur.close()
 
 
 def get_full_text_db(con, table, paper):
     cur = con.cursor()
-    cur.execute(f"SELECT text FROM {table} WHERE id = ?", (paper[0],))
+    # cur.execute(f"SELECT text FROM {table} WHERE id = ?", (paper[0],))
+    cur.execute(f"SELECT text FROM {table} WHERE id = %s", (paper[0],))
     text = cur.fetchone()[0]
     cur.close()
     return text
@@ -286,7 +325,7 @@ def api_gen_by_id(id):
     """run the generation pipeline for a paper by id"""
     print("running generation pipeline for paper id: ", id)
     paper = (id, "")
-    con = sqlite3.connect(full_path)
+    con = connect()
     ok = update_full_text_db(con, db_table, paper)
     if not ok:
         return False
@@ -301,16 +340,18 @@ def api_gen_by_id(id):
 def api_rm_gen_by_id(id):
     """clear the generated fields for a paper by id"""
     print("clearing generated fields for paper id: ", id)
-    con = sqlite3.connect(full_path)
+    con = connect()
     cur = con.cursor()
-    cur.execute(f"UPDATE {db_table} SET abstract = NULL, gen_keywords = NULL, gen_category = NULL, gen_ccs = NULL WHERE id = ?", (id,))
+    # cur.execute(f"UPDATE {db_table} SET abstract = NULL, gen_keywords = NULL, gen_category = NULL, gen_ccs = NULL WHERE id = ?", (id,))
+    cur.execute(f"UPDATE {db_table} SET abstract = NULL, gen_keywords = NULL, gen_category = NULL, gen_ccs = NULL WHERE id = %s", (id,))
     con.commit()
     con.close()
     return True
 
 def util_update_metadata_by_id(con, table, id):
     cur = con.cursor()
-    cur.execute(f"SELECT doi FROM {table} WHERE id = ?", (id,))
+    # cur.execute(f"SELECT doi FROM {table} WHERE id = ?", (id,))
+    cur.execute(f"SELECT doi FROM {table} WHERE id = %s", (id,))
     doi = cur.fetchone()[0]
     cur.close()
     if doi is None or doi == "":
@@ -342,7 +383,8 @@ def util_update_metadata_by_id(con, table, id):
         doi = "https://doi.org/" + data["DOI"]
         parent = data["container-title"][0]
         cur = con.cursor()
-        cur.execute(f"UPDATE {table} SET title = ?, authors = ?, year = ?, doi = ?, parent = ? WHERE id = ?", (title, authors, year, doi, parent, id))
+        # cur.execute(f"UPDATE {table} SET title = ?, authors = ?, year = ?, doi = ?, parent = ? WHERE id = ?", (title, authors, year, doi, parent, id))
+        cur.execute(f"UPDATE {table} SET title = %s, authors = %s, year = %s, doi = %s, parent = %s WHERE id = %s", (title, authors, year, doi, parent, id))
         con.commit()
         cur.close()
         print(f"updated metadata for {id}, title: {title}, year: {year}, doi: {doi}, parent: {parent}")
@@ -353,7 +395,8 @@ def util_update_metadata_by_id(con, table, id):
 
 def util_fetch_pdf_by_id(con, table, id):
     cur = con.cursor()
-    cur.execute(f"SELECT doi FROM {table} WHERE id = ?", (id,))
+    # cur.execute(f"SELECT doi FROM {table} WHERE id = ?", (id,))
+    cur.execute(f"SELECT doi FROM {table} WHERE id = %s", (id,))
     doi = cur.fetchone()[0]
     cur.close()
     if doi is None or doi == "":
@@ -372,8 +415,8 @@ def util_fetch_pdf_by_id(con, table, id):
         with open(pdf_path, "rb") as f:
             pdf = f.read()
             cur = con.cursor()
-            cur.execute(
-                f"UPDATE {table} SET pdf = ? WHERE id = ?", (pdf, id))
+            # cur.execute(f"UPDATE {table} SET pdf = ? WHERE id = ?", (pdf, id))
+            cur.execute(f"UPDATE {table} SET pdf = %s WHERE id = %s", (pdf, id))
             con.commit()
             print("pdf fetched and uploaded, id: " + str(id) +
                   ", size: " + str(len(pdf)) + " bytes")
@@ -387,8 +430,8 @@ def util_fetch_pdf_by_id(con, table, id):
                 return False
             pdf = f.read()
             cur = con.cursor()
-            cur.execute(
-                f"UPDATE {table} SET pdf = ? WHERE id = ?", (pdf, id))
+            # cur.execute(f"UPDATE {table} SET pdf = ? WHERE id = ?", (pdf, id))
+            cur.execute(f"UPDATE {table} SET pdf = %s WHERE id = %s", (pdf, id))
             con.commit()
             print("pdf fetched and uploaded, id: " + str(id) +
                   ", size: " + str(len(pdf)) + " bytes")
@@ -401,8 +444,9 @@ def api_update_all_metadata():
     # get authors, title, ... from crossref
     print("updating all metadata...")
     # iterate over all papers
-    con = sqlite3.connect(full_path)
+    con = connect()
     cur = con.cursor()
+    # cur.execute(f"SELECT id, doi FROM {db_table}")
     cur.execute(f"SELECT id, doi FROM {db_table}")
     papers = cur.fetchall()
     cur.close()
@@ -422,8 +466,9 @@ def api_update_all_pdf():
     # get pdf from crossref
     print("updating all pdf...")
     # iterate over all papers
-    con = sqlite3.connect(full_path)
+    con = connect()
     cur = con.cursor()
+    # cur.execute(f"SELECT id, doi FROM {db_table}")
     cur.execute(f"SELECT id, doi FROM {db_table}")
     papers = cur.fetchall()
     cur.close()
