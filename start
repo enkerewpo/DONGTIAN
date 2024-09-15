@@ -12,7 +12,7 @@
 # 3. if we need to pull, we will kill the child process and pull the repo and restart the child process
 
 # start the child process
-python3 server/core.py &
+python server/core.py &
 child_pid=$!
 
 echo "child process id: $child_pid"
@@ -25,7 +25,7 @@ while true; do
         echo "need to pull! quitting $child_pid and restart"
         kill $child_pid
         git pull
-        python3 server/core.py &
+        python server/core.py &
         child_pid=$!
     fi
     sleep 10
