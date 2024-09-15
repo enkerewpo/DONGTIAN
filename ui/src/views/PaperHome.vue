@@ -191,7 +191,6 @@ export default {
     },
     computed: {
         getPapers: function () {
-            this.checkSearchConditionsAndResetFrame();
             let ret = [];
             let filtered = [];
             if (this.search_title === "" && this.search_ccs === "" && this.search_category === "") {
@@ -248,6 +247,7 @@ export default {
                 // default sort by has pdf
                 ret2.sort((a, b) => b.has_pdf - a.has_pdf);
             }
+            this.reset(ret2.length);
             return ret2;
         },
         getPapersAtFrame: function () {
@@ -260,15 +260,6 @@ export default {
             console.log("getPapersAtFrame:", frame_idx, start, end, result);
             return result;
         },
-        getMaxFrame: function () {
-            // return the max frame index
-            let total = this.getPapers.length;
-            let max_frame = Math.floor(total / this.entries_per_frame);
-            if (total % this.entries_per_frame !== 0) {
-                max_frame += 1;
-            }
-            return max_frame;
-        },
         getCurrentCategoryList: function () {
             let papers = this.getPapers;
             let category_list = [];
@@ -280,9 +271,7 @@ export default {
             }
             return category_list;
         },
-    },
-    methods: {
-        getMaxFrameUtil: function () {
+        getMaxFrame: function () {
             // return the max frame index
             let total = this.getPapers.length;
             let max_frame = Math.floor(total / this.entries_per_frame);
@@ -291,24 +280,36 @@ export default {
             }
             return max_frame;
         },
-        checkSearchConditionsAndResetFrame: function () {
+    },
+    methods: {
+        getMaxFrameUtil: function (total) {
+            // return the max frame index
+            let max_frame = Math.floor(total / this.entries_per_frame);
+            if (total % this.entries_per_frame !== 0) {
+                max_frame += 1;
+            }
+            return max_frame;
+        },
+        reset: function (curent_papers_count) {
             // if any search condition is not empty, reset the current frame to 0
             let candidate = [this.search_title, this.search_ccs, this.search_category];
-            let reset = false;
+            let flag = false;
             for (let i = 0; i < candidate.length; i++) {
                 if (candidate[i] !== "") {
-                    reset = true;
+                    flag = true;
                     break;
                 }
             }
-            if (reset) {
+            if (flag) {
                 // if the value in local storage is within max frame, use that
                 let frame = getLocalStorage("current_frame", 0);
-                if (frame < this.getMaxFrameUtil) {
+                let max_frame = this.getMaxFrameUtil(curent_papers_count);
+                if (frame <= max_frame) {
                     this.setCurrentFrame(frame);
                 } else {
                     this.setCurrentFrame(0);
                 }
+                console.log("reset: current_frame -> ", frame, " max_frame -> ", max_frame);
             }
         },
         toggleSidebar: function () {

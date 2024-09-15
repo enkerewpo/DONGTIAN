@@ -108,6 +108,10 @@ export default {
                 let data = response.data.message;
                 console.log(data);
                 this.paper.title = data.title[0];
+                let subtitle = data.subtitle[0] ? data.subtitle[0] : '';
+                if (subtitle != '') {
+                    this.paper.title += ': ' + subtitle;
+                }
                 let authors_raw = data.author;
                 // convert author list to string, [name1@aff1][name2@aff2]...
                 let authors = '';

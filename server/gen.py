@@ -322,13 +322,22 @@ def util_update_metadata_by_id(con, table, id):
     if response.status_code == 200:
         data = response.json()["message"]
         title = data["title"][0]
+        subtitle = ""
+        if "subtitle" in data:
+            if len(data["subtitle"]) > 0:
+                subtitle = data["subtitle"][0]
         if title is None or title == "":
             print(f"title is None for {id}")
             return False
+        if subtitle is not None and subtitle != "":
+            title += ": " + subtitle
         authors_raw = data["author"]
         authors = ""
         for author in authors_raw:
-            authors += "[" + author["given"] + " " + author["family"] + "@" + author["affiliation"][0]["name"] + "]"
+            if len(author["affiliation"]) == 0:
+                authors += "[" + author["given"] + " " + author["family"] + "@none]"
+            else:
+                authors += "[" + author["given"] + " " + author["family"] + "@" + author["affiliation"][0]["name"] + "]"
         year = data["created"]["date-parts"][0][0]
         doi = "https://doi.org/" + data["DOI"]
         parent = data["container-title"][0]
