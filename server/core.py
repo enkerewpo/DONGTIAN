@@ -263,7 +263,6 @@ def post_update_all_pdf(request):
 
 if __name__ == '__main__':
     with Configurator() as config:
-
         config.add_route('hello', '/')
         config.add_view(hello_world, route_name='hello')
         config.add_route('get_paper_entries', '/get_paper_entries')
