@@ -403,10 +403,16 @@ def util_fetch_pdf_by_id(con, table, id):
         print(f"doi is None for {id}")
         return False
     doi = format_doi(doi)
-    cmd_dir = os.path.dirname(sys.executable) + "\\" + "Scripts\\"
+    # if on windows, use the python script
+    if os.name == "nt":
+        cmd_dir = os.path.dirname(sys.executable) + "/" + "Scripts/"
+    else:
+        cmd_dir = ""
+
     program = "scihub"
     args = f"-s {doi}"
     cmd = cmd_dir + program + " " + args
+    
     print(f"triggered pdf fetch for id: {id}, doi: {doi}, cmd: {cmd}")
     last = doi.split("/")[-1]
     pdf_path = "pdf/" + last + ".pdf"
