@@ -71,7 +71,7 @@ export default {
             api.post('update_paper/' + this.paper.id, this.paper)
                 .then(response => {
                     console.log(response);
-                    this.$router.go(-1);
+                    this.$router.push('/get_paper/' + this.paper.id);
                 })
                 .catch(error => {
                     console.log(error);
