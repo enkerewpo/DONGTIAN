@@ -30,8 +30,8 @@ with open("db_passwd", "r") as f:
     mysql_db_password = f.read()
     mysql_db_password = mysql_db_password.strip()
 
-con = pymysql.connect(host=mysql_db_url, port=mysql_db_port, user=mysql_db_user,
-                      password=mysql_db_password, db=mysql_db_name, charset='utf8mb4')
+# con = pymysql.connect(host=mysql_db_url, port=mysql_db_port, user=mysql_db_user,
+#                       password=mysql_db_password, db=mysql_db_name, charset='utf8mb4')
 
 def connect():
     con = pymysql.connect(host=mysql_db_url, port=mysql_db_port, user=mysql_db_user,
@@ -487,6 +487,23 @@ def api_update_all_pdf():
         if not ok:
             print(f"failed to fetch pdf for {id}")
     print("pdf update done")
+    con.close()
+
+def api_update_all_gen():
+    # run the generation pipeline for all papers
+    print("running generation pipeline for all papers...")
+    con = connect()
+    cur = con.cursor()
+    # cur.execute(f"SELECT id FROM {db_table}")
+    cur.execute(f"SELECT id FROM {db_table}")
+    papers = cur.fetchall()
+    cur.close()
+    for paper in papers:
+        id = paper[0]
+        ok = api_gen_by_id(id)
+        if not ok:
+            print(f"failed to run generation pipeline for {id}")
+    print("generation pipeline done")
     con.close()
 
 if __name__ == "__main__":

@@ -26,8 +26,8 @@ with open("db_passwd", "r") as f:
     mysql_db_password = f.read()
     mysql_db_password = mysql_db_password.strip()
 
-con = pymysql.connect(host=mysql_db_url, port=mysql_db_port, user=mysql_db_user,
-                      password=mysql_db_password, db=mysql_db_name, charset='utf8mb4')
+# con = pymysql.connect(host=mysql_db_url, port=mysql_db_port, user=mysql_db_user,
+#                       password=mysql_db_password, db=mysql_db_name, charset='utf8mb4')
 
 
 def hello_world(request):
@@ -61,29 +61,29 @@ def get_abstract(request):
 
 
 def get_paper_entries(request):
+    print("get_paper_entries")
     # open the database and get all the entries
     con = connect()
     cur = con.cursor()
-    # cur.execute(f"SELECT id, title, parent, year, doi, authors, gen_keywords, pdf, gen_category, gen_ccs FROM {db_table}")
-    # mysql syntax
-    cur.execute(f"SELECT id, title, parent, year, doi, authors, gen_keywords, pdf, gen_category, gen_ccs FROM {mysql_db_table}")
+    cur.execute(f"SELECT id, title, parent, year, doi, authors, gen_keywords, gen_category, gen_ccs, has_pdf FROM {mysql_db_table}")
+    print(f"selected {cur.rowcount} rows")
     json_data = []
 
     for row in cur.fetchall():
-        c = "none"
-        if row[8] is not None:
-            c = row[8]
+        id, title, parent, year, doi, authors, keywords, category, ccs, has_pdf = row
+        if category is None:
+            category = "none"
         json_data.append({
-            "id": row[0],
-            "title": row[1],
-            "parent": row[2],
-            "year": row[3],
-            "doi": row[4],
-            "authors": row[5],
-            "keywords": row[6],
-            "has_pdf": row[7] is not None,
-            "category": c,
-            "ccs": row[9]
+            "id": id,
+            "title": title,
+            "parent": parent,
+            "year": year,
+            "doi": doi,
+            "authors": authors,
+            "keywords": keywords,
+            "has_pdf": has_pdf,
+            "category": category,
+            "ccs": ccs
         })
     # default sorted by year in reverse order
     json_data = sorted(json_data, key=lambda x: x["year"], reverse=True)
@@ -116,28 +116,22 @@ def get_paper(request):
     # open the database and get the entry
     con = connect()
     cur = con.cursor()
-    # cur.execute(f"SELECT id, title, parent, year, doi, authors, gen_keywords, pdf, gen_category, gen_ccs, abstract FROM {db_table} WHERE id = ?", (id,))
-    # mysql syntax
-    cur.execute(f"SELECT id, title, parent, year, doi, authors, gen_keywords, pdf, gen_category, gen_ccs, abstract FROM {mysql_db_table} WHERE id = %s", (id,))
+    cur.execute(f"SELECT id, title, parent, year, doi, authors, gen_keywords, has_pdf, gen_category, gen_ccs, abstract FROM {mysql_db_table} WHERE id = %s", (id,))
     row = cur.fetchone()
+    id, title, parent, year, doi, gen_authors, gen_keywords, has_pdf, gen_category, gen_ccs, abstract = row
     con.close()
-    c = "none"
-    if row[8] is not None:
-        c = row[8]
     json_data = {
-        "id": row[0],
-        "title": row[1],
-        "parent": row[2],
-        "year": row[3],
-        "doi": row[4],
-        "authors": row[5],
-        "keywords": row[6],
-        "has_pdf": row[7] is not None,
-        "category": c,
-        "ccs": row[9],
-        "abstract": row[10],
-        # "reference_raw": row[11],
-        "citations": 0,
+        "id": id,
+        "title": title,
+        "parent": parent,
+        "year": year,
+        "doi": doi,
+        "authors": gen_authors,
+        "keywords": gen_keywords,
+        "has_pdf": has_pdf,
+        "category": gen_category if gen_category is not None else "none",
+        "ccs": gen_ccs,
+        "abstract": abstract
     }
     return Response(json=json_data)
 
@@ -182,6 +176,7 @@ def post_add_one(request):
     cur.execute(f"INSERT INTO {mysql_db_table} (title, year) VALUES (%s, %s)", (title, year))
     con.commit()
     con.close()
+    return Response(body=json.dumps({"id": cur.lastrowid}), content_type='application/json', charset='utf-8')
 
 
 def post_rm_paper(request):
@@ -287,12 +282,30 @@ def post_update_all_pdf(request):
     threading.Thread(target=api_update_all_pdf).start()
     return Response("update all pdf triggered")
 
+def post_update_all_gen(request):
+    # use another thread to do this asynchronizely!!!
+    threading.Thread(target=api_update_all_gen).start()
+    return Response("update all gen triggered")
+
+def post_transaction_has_pdf(request):
+    # trigger server to run update_has_pdf routine
+    con = connect()
+    # call procedure
+    cur = con.cursor()
+    cur.callproc("update_has_pdf")
+    con.commit()
+    con.close()
+    return Response("transaction has_pdf triggered")
+
 if __name__ == '__main__':
     with Configurator() as config:
+
         config.add_route('hello', '/')
         config.add_view(hello_world, route_name='hello')
+
         config.add_route('get_paper_entries', '/get_paper_entries')
         config.add_view(get_paper_entries, route_name='get_paper_entries')
+        
         config.add_route('get_pdf', '/get_pdf/{id}')
         config.add_view(get_pdf, route_name='get_pdf')
         config.add_route('get_abstract', '/get_abstract/{id}')
@@ -321,6 +334,10 @@ if __name__ == '__main__':
         config.add_view(post_update_all_pdf, route_name='update_all_pdf')
         config.add_route('category_and_count', '/category_and_count')
         config.add_view(get_cateogry_and_count, route_name='category_and_count')
+        config.add_route('update_all_gen', '/update_all_gen')
+        config.add_view(post_update_all_gen, route_name='update_all_gen')
+        config.add_route('transaction_has_pdf', '/transaction_has_pdf')
+        config.add_view(post_transaction_has_pdf, route_name='transaction_has_pdf')
 
         app = config.make_wsgi_app()
 

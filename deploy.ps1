@@ -95,13 +95,15 @@ if ($commit) {
     Write-Log -Severity Info -Message "commit is true"
     git add .
     
+    # export LESSCHARSET=utf-8 in powershell to avoid garbled characters
+    $env:LESSCHARSET = "utf-8"
     $diff = git diff HEAD
     
     # output to tmp_diff.txt
     $diff | Out-File -FilePath tmp_diff.txt
     
     # trim diff to 1000 characters
-    $end = [Math]::Min(500, $diff.Length)
+    $end = [Math]::Min(300, $diff.Length)
     Write-Log -Severity Info -Message "end: $end"
     $diff = $diff[0..$end] -join ''
 

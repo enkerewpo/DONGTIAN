@@ -121,12 +121,17 @@ export default {
                             // ui_log('自动获取引用元信息失败：' + doi, 'error');
                             continue;
                         }
-                        let title = ref_cross_ref.title ? ref_cross_ref.title : "[No title]";
+                        let title = ref_cross_ref['title'][0];
+                        let subtitle = '';
+                        if (ref_cross_ref['subtitle'][0]) {
+                            subtitle = ref_cross_ref['subtitle'][0];
+                        }
+                        title = title + ': ' + subtitle;
                         let year = ref_cross_ref.issued['date-parts'][0][0] ? ref_cross_ref.issued['date-parts'][0][0] : "[No year]";
                         let author0 = ref_cross_ref.author ? ref_cross_ref.author[0].family : "[No author]";
                         let event = ref_cross_ref.event ? ref_cross_ref.event.name : "[No event]";
                         let container_title = ref_cross_ref['container-title'] ? ref_cross_ref['container-title'][0] : "[No container title]";
-                        let formatted = `${author0} (${year}). ${title}. ${container_title}. ${event}.`;
+                        let formatted = `${author0} (${year}). ${title}. ${container_title}.`;
                         generated = formatted;
                     }
                     let unstructured = reference_raw[i].unstructured;
@@ -175,6 +180,9 @@ export default {
             this.$router.go(0);
         },
         formatAuthors(authors) {
+            if (authors == null) {
+                return [];
+            }
             let authors_list = authors.split(']');
             // return a list of {name, affiliation}
             let formatted = [];
@@ -193,6 +201,9 @@ export default {
             return formatted;
         },
         formatAffiliations(authors) {
+            if (authors == null) {
+                return [];
+            }
             let affiliation_set = new Set();
             let authors_list = authors.split(']');
             for (let i = 0; i < authors_list.length; i++) {

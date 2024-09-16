@@ -90,7 +90,7 @@ console.log('HomeView setup');
 // send a request to get the category and count info and update the option
 onMounted(async () => {
     console.log('HomeView onMounted');
-    const response = await api.get('/category_and_count');
+    const response = await api.get('category_and_count');
     console.log(response.data);
     // format: [{name: 'cat1', count: 100}, ...]
     // update the option

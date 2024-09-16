@@ -12,6 +12,7 @@
 # 3. if we need to pull, we will kill the child process and pull the repo and restart the child process
 
 # start the child process
+npx kill-port 3332
 python server/core.py &
 child_pid=$!
 
@@ -25,6 +26,7 @@ while true; do
         echo "need to pull! quitting $child_pid and restart"
         kill $child_pid
         git pull
+        npx kill-port 3332
         python server/core.py &
         child_pid=$!
     fi

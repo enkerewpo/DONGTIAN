@@ -154,6 +154,7 @@ export default {
         // Fetch the paper entries data when the component is mounted.
         onMounted(async () => {
             try {
+                console.log("fetching paper entries");
                 const response = await api.get('get_paper_entries');
                 let r = process(response.data);
                 papers.value = r;
@@ -370,10 +371,17 @@ export default {
         addOnePaperEntry: function () {
             // api/add_one
             // this will add a default paper entry with YEAR 2099
-            const response = api.post('add_one');
-            console.log(response);
-            this.forceRefresh();
-            ui_log("已添加一条记录");
+            api.post('add_one').then(response => {
+                console.log(response);
+                let id = response.data.id;
+                // jump to /edit_paper/{id}
+                this.$router.push("/edit_paper/" + id);
+                this.forceRefresh();
+                ui_log("已添加一条记录");
+            }).catch(error => {
+                console.error("Error adding one paper entry:", error);
+                ui_log("添加失败");
+            });
         },
         getTitleById: function (id) {
             for (let i = 0; i < this.papers.length; i++) {
@@ -486,6 +494,18 @@ export default {
                 ui_log("刷新失败");
             });
         },
+        forceRunTransactionHasPdf: function () {
+            // force run the transaction to update the has_pdf field
+            const url = "/transaction_has_pdf";
+            api.post(url).then(response => {
+                console.log(response);
+                ui_log("已触发数据库更新PDF状态流程");
+                this.forceRefresh();
+            }).catch(error => {
+                console.error("Error triggering update has_pdf process:", error);
+                ui_log("更新PDF状态失败");
+            });
+        },
         onChangeSearchTitle: function () {
             console.log("onChangeSearchTitle:", this.search_title);
             setLocalStorage("search_title", this.search_title);
@@ -523,6 +543,18 @@ export default {
                 ui_log("PDF更新失败");
             });
         },
+        ayncUpdateAllGen: function () {
+            // trigger the update gen process for all papers
+            const url = "/update_all_gen";
+            api.post(url).then(response => {
+                console.log(response);
+                ui_log("GEN更新已触发，后台异步处理中");
+                this.forceRefresh();
+            }).catch(error => {
+                console.error("Error triggering update gen process:", error);
+                ui_log("GEN更新失败");
+            });
+        },
     },
 };
 </script>
@@ -540,6 +572,12 @@ export default {
                     </VaButton>
                     <VaButton @click="ayncUpdateAllPDF" class="mr-2" border-color="primary" size="small">
                         自动获取全部PDF（SCIHUB）
+                    </VaButton>
+                    <VaButton @click="ayncUpdateAllGen" class="mr-2" border-color="primary" size="small">
+                        自动获取全部GEN（GPT）
+                    </VaButton>
+                    <VaButton @click="forceRunTransactionHasPdf" class="mr-2" border-color="primary" size="small">
+                        更新PDF状态
                     </VaButton>
                 </div>
                 <div class="va-input-group mb-2 mt-2">
@@ -563,6 +601,7 @@ export default {
                     <VaInput placeholder="按标题查询" v-model="search_title" class="mr-2" @change="onChangeSearchTitle" />
                     <!-- <VaInput placeholder="按分类查询" v-model="search_category" class="mr-2" /> -->
                     <VaInput placeholder="按CCS查询" v-model="search_ccs" class="mr-2" />
+                    <VaInput placeholder="按机构查询" v-model="search_affiliation" class="mr-2" />
                     <VaSelect placeholder="按分类查询" v-model="search_category" class="mr-2"
                         :options="getCurrentCategoryList" @update:modelValue="onChangeSearchCategory" />
                     <VaButton @click="clearSearchByCategory" class="mr-2 mt-2" border-color="primary" size="small">清除分类
