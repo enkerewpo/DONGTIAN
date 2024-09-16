@@ -326,6 +326,12 @@ def post_download_pdf(request):
     else:
         return Response("pdf download failed, download url returned status code: " + str(response.status_code), status=500)
     
+def post_gen_authors(request):
+    # trigger the GEN process for the paper authors
+    # api url: /api/post_gen_authors/{id}
+    id = request.matchdict['id']
+    api_gen_authors_by_id(id)
+    return Response("gen triggered for authors of id: " + id)
 
 if __name__ == '__main__':
     with Configurator() as config:
@@ -370,6 +376,8 @@ if __name__ == '__main__':
         config.add_view(post_transaction_has_pdf, route_name='transaction_has_pdf')
         config.add_route('download_pdf', '/download_pdf/{id}')
         config.add_view(post_download_pdf, route_name='download_pdf')
+        config.add_route('gen_authors', '/gen_authors/{id}')
+        config.add_view(post_gen_authors, route_name='gen_authors')
 
         app = config.make_wsgi_app()
 

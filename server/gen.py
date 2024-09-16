@@ -508,6 +508,35 @@ def api_update_all_gen():
     print("generation pipeline done")
     con.close()
 
+def api_gen_authors_by_id(id):
+    """run the generation pipeline for authors for a paper by id"""
+    print("running generation pipeline for authors for paper id: ", id)
+    con = connect()
+    cur = con.cursor()
+    cur.execute(f"SELECT authors FROM {db_table} WHERE id = %s", (id,))
+    authors = cur.fetchone()[0]
+    cur.close()
+    if authors is not None and authors != "":
+        print(f"authors already exists for {id}")
+        return False
+    # get the authors from the full text by sending it to the GPT model
+    text = get_full_text_db(con, db_table, (id, ""))
+    history = []
+    history.append(
+        {"role": "user", "content": "response should be the authors and his/her affiliation, return in format like [John Doe@MIT][Jane Doe@Harvard][Alice Doe@none]"})
+    response = get_llm_response(text[:N], history)
+    response = response.strip()
+    response = response.replace("*", "")
+    response = response.replace("\n", "")
+    response = response.replace("\r", "")
+    print(f"authors: {response}")
+    cur = con.cursor()
+    cur.execute(f"UPDATE {db_table} SET authors = %s WHERE id = %s", (response, id))
+    con.commit()
+    cur.close()
+    con.close()
+    return True
+
 if __name__ == "__main__":
     papers = get_papers_with_pdf(con, db_table)
     for paper in papers:

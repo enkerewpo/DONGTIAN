@@ -455,6 +455,19 @@ export default {
                 ui_log("GPT生成失败");
             });
         },
+        triggerGenAuthors: function (id) {
+            // trigger the GEN process for the paper authors
+            // api url: /api/gen_authors/{id}
+            const url = "/gen_authors/" + id;
+            api.post(url).then(response => {
+                console.log(response);
+                ui_log("GPT生成已完成");
+                this.forceRefresh();
+            }).catch(error => {
+                console.error("Error triggering GEN process:", error);
+                ui_log("GPT生成失败");
+            });
+        },
         removeGen: function (id) {
             // remove the GEN file
             let url = "/post_rm_gen/" + id;
@@ -718,6 +731,8 @@ export default {
                                 <VaButton size="small" @click="triggerGen(p.id)" class="mr-1" color="secondary">+
                                 </VaButton>
                                 <VaButton size="small" @click="removeGen(p.id)" class="" color="secondary">-
+                                </VaButton>
+                                <VaButton size="small" @click="triggerGenAuthors(p.id)" class="mr-1" color="secondary">A
                                 </VaButton>
                             </td>
                         </tr>
