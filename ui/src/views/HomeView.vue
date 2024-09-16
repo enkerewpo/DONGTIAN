@@ -84,6 +84,16 @@ const option = ref({
 
 const color_palette = ['#8ea604', '#ec9f05', '#f5bb00', '#d76a03', '#bf3100', '#8c0d0d', '#5c0a0a', '#2d0707', '#495E57', '#173B45'];
 
+function auto_hide_ui() {
+    if (window.innerWidth < 1000) {
+        option.value.legend.show = false;
+        option.value.title.text = '';
+    } else {
+        option.value.legend.show = true;
+        option.value.title.text = 'CATEGORY OVERVIEW';
+    }
+}
+
 console.log('HomeView setup');
 // send a request to get the category and count info and update the option
 onMounted(async () => {
@@ -102,11 +112,8 @@ onMounted(async () => {
     });
     data = data.filter(item => item !== null);
     option.value.series[0].data = data;
-    // set chart name
     option.value.title.text = 'CATEGORY OVERVIEW';
-    // always show legend
     option.value.legend.data = data.map(item => item.name);
-    // set font to arial small
     option.value.textStyle = {
         fontFamily: 'Arial',
         fontSize: 12,
@@ -117,9 +124,12 @@ onMounted(async () => {
         item.itemStyle = { color: color_palette[index % color_palette.length] };
     });
 
+    auto_hide_ui();
+
     // add listener for chart when windows resize
     window.addEventListener('resize', () => {
-        console.log('resize');
+        console.log('resize, width:', window.innerWidth);
+        auto_hide_ui();
     });
 });
 

@@ -182,6 +182,7 @@ export default {
             search_title: getLocalStorage("search_title", ""),
             search_ccs: getLocalStorage("search_ccs", ""),
             search_category: getLocalStorage("search_category", ""),
+            search_affiliation: getLocalStorage("search_affiliation", ""),
             sorted_by: "year", // support year and parent
             sorted_order: "desc", // "asc" or "desc" if possible
             tmp_pdf_upload_id: null,
@@ -191,10 +192,15 @@ export default {
         };
     },
     computed: {
+        getCheckList: function () {
+            return [this.search_title, this.search_ccs, this.search_category, this.search_affiliation];
+        },
         getPapers: function () {
+            let check_list = this.getCheckList;
             let ret = [];
             let filtered = [];
-            if (this.search_title === "" && this.search_ccs === "" && this.search_category === "") {
+            console.log("getPapers: check_list:", check_list);
+            if (check_list.every(e => e === "")) {
                 ret = this.papers;
             } else {
                 if (this.search_title === "") {
@@ -223,7 +229,20 @@ export default {
                 if (this.search_category !== "") {
                     ret = ret.filter(p => p.category === this.search_category);
                 }
-                console.log("ret length:", ret.length);
+                console.log("ret length after category:", ret.length);
+                // filter by affiliation if not empty
+                if (this.search_affiliation !== "") {
+                    ret = ret.filter(p => {
+                        let a = p.affiliations;
+                        for (let i = 0; i < a.length; i++) {
+                            if (a[i].toLowerCase().includes(this.search_affiliation.toLowerCase())) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    });
+                }
+                console.log("ret length after affiliation:", ret.length);
             }
             // then check sorted_by
             let ret2 = ret;
@@ -293,7 +312,7 @@ export default {
         },
         reset: function (curent_papers_count) {
             // if any search condition is not empty, reset the current frame to 0
-            let candidate = [this.search_title, this.search_ccs, this.search_category];
+            let candidate = this.getCheckList;
             let flag = false;
             for (let i = 0; i < candidate.length; i++) {
                 if (candidate[i] !== "") {
