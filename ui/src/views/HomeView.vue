@@ -73,18 +73,16 @@ const option = ref({
             ],
             emphasis: {
                 itemStyle: {
-                    shadowBlur: 10,
+                    shadowBlur: 5,
                     shadowOffsetX: 0,
-                    shadowColor: "rgba(0, 0, 0, 0.5)"
+                    shadowColor: "rgba(0, 0, 0, 0.2)"
                 }
             }
         }
     ]
 });
 
-const color_palette = [
-    '#FF0000', '#FFA500', '#FFFF00', '#008000', '#0000FF', '#4B0082', '#EE82EE', '#000000', '#808080', '#FFFFFF'
-];
+const color_palette = ['#8ea604', '#ec9f05', '#f5bb00', '#d76a03', '#bf3100', '#8c0d0d', '#5c0a0a', '#2d0707', '#495E57', '#173B45'];
 
 console.log('HomeView setup');
 // send a request to get the category and count info and update the option
@@ -105,7 +103,14 @@ onMounted(async () => {
     data = data.filter(item => item !== null);
     option.value.series[0].data = data;
     // set chart name
-    option.value.title.text = '各分类论文数量';
+    option.value.title.text = 'CATEGORY OVERVIEW';
+    // always show legend
+    option.value.legend.data = data.map(item => item.name);
+    // set font to arial small
+    option.value.textStyle = {
+        fontFamily: 'Arial',
+        fontSize: 12,
+    };
 
     // add color palette to option series
     option.value.series[0].data.forEach((item, index) => {
@@ -122,7 +127,7 @@ onMounted(async () => {
 
 <style scoped>
 .chart {
-    height: 400px;
+    height: 500px;
 }
 
 .home-view {
