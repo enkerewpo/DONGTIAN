@@ -3,6 +3,8 @@
         <div v-if="paper">
             <VaButton @click="goBack" class="mb-1" size="small">返回</VaButton>
             <VaButton @click="editPaper" class="ml-1 mb-1" size="small">编辑</VaButton>
+            <VaButton @click="autoFetchPDFfromScihub" class="ml-1 mb-1" size="small">由DOI自动下载PDF(SCIHUB)</VaButton>
+            <VaButton @click="gotoPdfSearchFrame" class="ml-1 mb-1" size="small">手动搜索PDF</VaButton>
             <h1 class="va-h4">{{ paper.title }}</h1>
             <div class="va-text-block">
                 <h2 class="va-h6 mb-3">摘要</h2>
@@ -215,6 +217,30 @@ export default {
                 affiliation_set.add(affiliation);
             }
             return Array.from(affiliation_set);
+        },
+        async autoFetchPDFfromScihub() {
+            let doi = this.paper.doi; // in format of https://doi.org/10.5555/12345678
+            if (!doi || doi == '') {
+                ui_log('自动下载PDF失败，DOI为空');
+            }
+            if (doi.startsWith('https://doi.org/')) {
+                // remove 'https://doi.org/' prefix
+                doi = doi.split('https://doi.org/')[1];
+            }
+            ui_log('[DEBUG] doi: ' + doi);
+            // send a post request to /fetch_pdf/id to trigger a background task to fetch pdf
+            try {
+                ui_log('正在执行自动下载PDF流程，请不要关闭页面！');
+                const response = await api.post('fetch_pdf/' + this.paper.id, { doi: doi });
+                console.log(response);
+                ui_log('成功找到PDF并更新数据库');
+            } catch (error) {
+                console.log(error);
+                ui_log('自动下载PDF失败：' + error + '，MSG: ' + error.response.data);
+            }
+        },
+        gotoPdfSearchFrame() {
+            this.$router.push(`/search_pdf/${this.paper.id}`);
         },
     },
 }

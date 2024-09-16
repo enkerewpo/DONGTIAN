@@ -297,6 +297,36 @@ def post_transaction_has_pdf(request):
     con.close()
     return Response("transaction has_pdf triggered")
 
+def post_download_pdf(request):
+    # api.post(`/download_pdf/${$route.params.id}`, { url: downloadUrl }).then(res => {
+    # trigger a server download of the pdf file and automatically add it to the database
+    form = request.json_body
+    url = form["url"]
+    print(f"downloading pdf from url: {url}")
+    id = request.matchdict['id']
+    # download the pdf file using requests
+    import requests
+    response = requests.get(url, stream=True)
+    pdf_name = f"tmp.pdf"
+    # dump response content to json
+    json_debug = {
+        "status_code": response.status_code,
+        "headers": dict(response.headers),
+        "content": str(response.content)
+    }
+    # print(json_debug)
+    pdf_binary_data = response.content
+    if response.status_code == 200:
+        con = connect()
+        cur = con.cursor()
+        cur.execute(f"UPDATE {mysql_db_table} SET pdf = %s WHERE id = %s", (pdf_binary_data, id))
+        con.commit()
+        con.close()
+        return Response("pdf downloaded and uploaded, id: " + id)
+    else:
+        return Response("pdf download failed, download url returned status code: " + str(response.status_code), status=500)
+    
+
 if __name__ == '__main__':
     with Configurator() as config:
 
@@ -338,6 +368,8 @@ if __name__ == '__main__':
         config.add_view(post_update_all_gen, route_name='update_all_gen')
         config.add_route('transaction_has_pdf', '/transaction_has_pdf')
         config.add_view(post_transaction_has_pdf, route_name='transaction_has_pdf')
+        config.add_route('download_pdf', '/download_pdf/{id}')
+        config.add_view(post_download_pdf, route_name='download_pdf')
 
         app = config.make_wsgi_app()
 

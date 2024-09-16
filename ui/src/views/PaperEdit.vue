@@ -5,7 +5,7 @@
             <VaButton @click="submitEdit" class="ml-1 mb-1" size="small">提交</VaButton>
             <VaButton @click="deleteEntry" class="ml-1 mb-1" size="small">删除</VaButton>
             <VaButton @click="updateFromCrossRef" class="ml-1 mb-1" size="small">由DOI在线更新基本信息</VaButton>
-            <VaButton @click="autoFetchPDFfromScihub" class="ml-1 mb-1" size="small">由DOI自动下载PDF(Sci-Hub)</VaButton>
+            <!-- <VaButton @click="autoFetchPDFfromScihub" class="ml-1 mb-1" size="small">由DOI自动下载PDF(Sci-Hub)</VaButton> -->
             <h1 class="va-h4 mb-5">正在编辑：{{ paper.title }}</h1>
             <VaForm ref="formRef" class="flex flex-col items-baseline gap-6">
                 <VaTextarea v-model="paper.title" label="标题" placeholder="请输入标题" class="textarea" />

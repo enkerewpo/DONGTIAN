@@ -162,6 +162,14 @@ export default {
                 console.error("Error fetching paper entries:", error);
             }
 
+            try {
+                console.log("triggering transaction to update has_pdf field");
+                const response = await api.post('transaction_has_pdf');
+                console.log(response);
+            } catch (error) {
+                console.error("Error triggering transaction to update has_pdf field:", error);
+            }
+
             checkScreenWidth();
             window.addEventListener('resize', checkScreenWidth);
         });
@@ -593,7 +601,7 @@ export default {
                         自动获取全部PDF（SCIHUB）
                     </VaButton>
                     <VaButton @click="ayncUpdateAllGen" class="mr-2" border-color="primary" size="small">
-                        自动获取全部GEN（GPT）
+                        自动获取全部GEN（GPT4）
                     </VaButton>
                     <VaButton @click="forceRunTransactionHasPdf" class="mr-2" border-color="primary" size="small">
                         更新PDF状态

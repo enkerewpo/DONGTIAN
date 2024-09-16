@@ -4,6 +4,7 @@ import PaperHome from '@/views/PaperHome.vue'
 import AboutView from '@/views/AboutView.vue'
 import Paper from '../views/Paper.vue'
 import PaperEdit from '@/views/PaperEdit.vue'
+import PdfSearchFrame from '@/views/PdfSearchFrame.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -36,6 +37,11 @@ const router = createRouter({
       path: '/edit_paper/:id',
       name: 'edit_paper',
       component: PaperEdit
+    },
+    {
+      path: '/search_pdf/:id',
+      name: 'search_pdf',
+      component: PdfSearchFrame
     }
   ]
 })

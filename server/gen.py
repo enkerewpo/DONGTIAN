@@ -223,6 +223,8 @@ def update_category_db(con, table, paper):
     history = []
     history.append(
         {"role": "user", "content": "response should be one category, available categories:" + ",".join(default_categories)})
+    history.append(
+        {"role": "user", "content": "strictly return the strings in my list, no extra words, no dialog, no extra spaces, no Category: prefix, no punctuation like : ; . ,"})
     response = get_llm_response(text[:N], history)
     response = response.strip()
     response = response.replace("*", "")

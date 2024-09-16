@@ -17,7 +17,8 @@
     "vue-chartjs": "^5.3.1",
     "vue-echarts": "^7.0.3",
     "vue-router": "^4.3.3",
-    "vuestic-ui": "^1.9.0"
+    "vuestic-ui": "^1.9.0",
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.5",
