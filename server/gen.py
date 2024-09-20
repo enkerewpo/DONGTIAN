@@ -384,12 +384,16 @@ def util_update_metadata_by_id(con, table, id):
         year = data["created"]["date-parts"][0][0]
         doi = "https://doi.org/" + data["DOI"]
         parent = data["container-title"][0]
+        reference_count = data["reference-count"]
+        if reference_count == None:
+            cited_count = 0
+        else:
+            cited_count = data["reference-count"]
         cur = con.cursor()
-        # cur.execute(f"UPDATE {table} SET title = ?, authors = ?, year = ?, doi = ?, parent = ? WHERE id = ?", (title, authors, year, doi, parent, id))
-        cur.execute(f"UPDATE {table} SET title = %s, authors = %s, year = %s, doi = %s, parent = %s WHERE id = %s", (title, authors, year, doi, parent, id))
+        cur.execute(f"UPDATE {table} SET title = %s, authors = %s, year = %s, doi = %s, parent = %s, cited_count = %s WHERE id = %s", (title, authors, year, doi, parent, cited_count, id))
         con.commit()
         cur.close()
-        print(f"updated metadata for {id}, title: {title}, year: {year}, doi: {doi}, parent: {parent}")
+        print(f"updated metadata for {id}, title: {title}, year: {year}, doi: {doi}, parent: {parent}, cited_count: {cited_count}")
         return True
     else:
         print(f"failed to fetch paper data from CrossRef for {id}")

@@ -159,7 +159,8 @@ if ($commit) {
 
     git commit -m $choices
     git push
-
+    git push --mirror 'https://github.com/enkerewpo/DONGTIAN'
+    Write-Log -Severity Success -Message "commit done!"
 }
 
 if ($push_db_to_remote) {

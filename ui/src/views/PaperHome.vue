@@ -102,6 +102,7 @@ function process(data) {
         if (entry.doi === undefined || entry.doi === null) {
             entry.doi = "NO DOI";
         }
+        let cited_count = entry.cited_count;
         let doi_num = entry.doi.split("/").slice(-1)[0];
         r.push({
             id: entry.id,
@@ -119,6 +120,7 @@ function process(data) {
             ccs: ccs_concepts,
             pdf_open_url: pdf_open_url,
             abstract_open_url: abstract_open_url,
+            cited_count: cited_count,
         });
     }
 
@@ -671,11 +673,11 @@ export default {
                             <th>DOI</th>
                             <th>Authors</th>
                             <th>Affiliations</th>
+                            <th>Cited Count</th>
                             <th>Category</th>
                             <th>Keywords</th>
                             <th>CCS Concepts</th>
                             <th>PDF</th>
-                            <!-- <th>Abstract</th> -->
                             <th>PDF CTRL</th>
                             <th>GEN</th>
                         </tr>
@@ -705,6 +707,7 @@ export default {
                                     <span class="smallest">{{ affiliation }}.</span>
                                 </template>
                             </td>
+                            <td class="smaller">{{ p.cited_count }}</td>
                             <td>
                                 <VaBadge :text="p.category" :color="p.category_color" />
                             </td>

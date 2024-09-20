@@ -65,12 +65,12 @@ def get_paper_entries(request):
     # open the database and get all the entries
     con = connect()
     cur = con.cursor()
-    cur.execute(f"SELECT id, title, parent, year, doi, authors, gen_keywords, gen_category, gen_ccs, has_pdf FROM {mysql_db_table}")
+    cur.execute(f"SELECT id, title, parent, year, doi, authors, gen_keywords, gen_category, gen_ccs, has_pdf, cited_count FROM {mysql_db_table}")
     print(f"selected {cur.rowcount} rows")
     json_data = []
 
     for row in cur.fetchall():
-        id, title, parent, year, doi, authors, keywords, category, ccs, has_pdf = row
+        id, title, parent, year, doi, authors, keywords, category, ccs, has_pdf, cited_count = row
         if category is None:
             category = "none"
         json_data.append({
@@ -83,7 +83,8 @@ def get_paper_entries(request):
             "keywords": keywords,
             "has_pdf": has_pdf,
             "category": category,
-            "ccs": ccs
+            "ccs": ccs,
+            "cited_count": cited_count
         })
     # default sorted by year in reverse order
     json_data = sorted(json_data, key=lambda x: x["year"], reverse=True)
